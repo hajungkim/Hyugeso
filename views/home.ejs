@@ -1,0 +1,76 @@
+<html>
+    <head>
+    </head>
+
+    <body>
+        <div id='title'>
+            <h1>휴게소 앱</h1>
+        </div>
+        <div id='homeMap' style='width:500px; height:300px; background-color: chartreuse;'>
+            <!-- kakao 지도 -->
+        </div>
+        <div id='homeList' style='width:500px; height:300px; overflow:scroll; overflow-x:hidden;'>
+        </div>
+        <div id='homeBtn' style='width:500px; height:50px; margin-top:20px;'>
+            <button id='btnInfo'>휴게소정보</button>
+            <button id='btnOrder'>음식주문</button>
+        </div>
+        <div id='footer' style='width:500px; height:50px;'>
+            <button>장바구니</button>
+            <button>홈</button>
+            <button>주문내역</button>
+        </div>
+    </body>
+</html>
+
+<script src="/public/js/jquery-3.3.1.min.js"></script>
+
+
+<!-- home 화면 로딩 되면, 휴게소좌표 찍기위해서 데이터 요청 -->
+<script>
+    let result;
+    $.ajax({
+        url: '/requestRestAreaLatLong',
+        type: 'POST',
+        success: function(data) {
+            result = JSON.parse(data);
+            // console.log(result);
+            drawList(result);
+        }
+    })
+
+    function drawList(results) {
+        const listDiv = document.getElementById('homeList');
+        for(i in results) {
+            const componentUl = document.createElement('ul');
+            componentUl.id = results[i].area_code;
+            componentUl.innerHTML = results[i].area_nm;
+            listDiv.appendChild(componentUl);
+        }
+    }
+
+</script>
+
+<!-- 휴게소 선택 후, 휴게소 정보 버튼 클릭시 -->
+<script>
+    $('#btnInfo').click(function() {
+        location.href = '/info';
+        $.ajax({
+            url: '/requestRestAreaInfo',
+            type: 'POST',
+            data: {
+                area_code: 'RA001', // 여기로 휴게소 코드 넘겨 주어야 합니다
+            },
+            success: function(data) {
+                console.log(data);
+            }
+        })
+    });
+</script>
+
+<!-- 휴게소 선택 후, 음식주문 버튼 클릭시 -->
+<script>
+    $('#btnOrder').click(function() {
+        location.href = '/order';
+    });
+</script>

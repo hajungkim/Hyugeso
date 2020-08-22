@@ -43,7 +43,6 @@
         const submit = document.createElement('input');
         submit.type = 'submit';
         submit.value = '휴게소 정보';
-        
         for(i in results) {
             const li = document.createElement('li');
 
@@ -81,7 +80,7 @@
     // 인포윈도우를 생성합니다
     var infowindow = new kakao.maps.InfoWindow({
         content : null,
-        removable : true
+        removable : true,
     });
 
     // 휴게소 좌표 - 마커표시
@@ -102,10 +101,6 @@
         });
 
         marker.setMap(map);
-
-        // 마커를 클릭했을 때 마커 위에 표시할 인포윈도우를 생성합니다
-        var iwContent = `<div style="padding:5px;">${areaInfo.name}</div>`; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
-        var iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
 
         kakao.maps.event.addListener(marker, 'click', makeOverListener(map, marker, infowindow, areaInfo));
     }
@@ -143,7 +138,20 @@
 
 function makeOverListener(map, marker, infowindow, areaInfo) {
     return function() {
-        infowindow.setContent(areaInfo.name);
+        var iwContent =  `<div class="wrap">
+                 <div class="info">    
+                     <div class="title">    
+                        ${areaInfo.name}
+                         <div class="close" onclick="closeOverlay()" title="닫기"></div>    
+                     </div>    
+                     <div class="body">    
+                         <div class="desc">    
+                             <div><a href="http://localhost:3000/restAreaInfo?area_code=${areaInfo.code}" target="_blank" class="link">휴게소정보</a></div>    
+                         </div>    
+                     </div>    
+                 </div>       
+             </div>`
+        infowindow.setContent(iwContent);
         infowindow.setPosition(new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude));
         infowindow.open(map,marker);
     };

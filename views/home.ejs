@@ -11,15 +11,19 @@
     ></script>
   </head>
   <body>
-    <div id="kakaoMap" style="width: 40%; height: 400px;"></div>
+    <div id="kakaoMap" style="width: 100%; height: 400px;"></div>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d698315979c98f65a32752dc88bd959d"></script>
 
-    <div id='restareaList' style="width: 40%; height: 400px; overflow: scroll; overflow-x: hidden">
+    <div id='restareaList' style="width: 100%; height: 400px; overflow: scroll; overflow-x: hidden">
       <form action="/restAreaInfo">
         <ul id='listItems'>
             <!-- 휴게소 목록 리스트 -->
         </ul>
       </form>
+    </div>
+    <div id='homeBtn' style='width:100%; height:50px; margin-top:20px;'>
+        <button id='btnInfo'>휴게소정보</button>
+        <button id='btnOrder'>음식주문</button>
     </div>
   </body>
 </html>

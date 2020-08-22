@@ -78,6 +78,12 @@
     };
     var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
     
+    // 인포윈도우를 생성합니다
+    var infowindow = new kakao.maps.InfoWindow({
+        content : null,
+        removable : true
+    });
+
     // 휴게소 좌표 - 마커표시
     for(var i in data) {
         var areaInfo = {
@@ -91,10 +97,17 @@
         var marker = new kakao.maps.Marker({
             map: map,
             position: new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude),
-            title: areaInfo.name
+            title: areaInfo.name,
+            clickable : true
         });
 
         marker.setMap(map);
+
+        // 마커를 클릭했을 때 마커 위에 표시할 인포윈도우를 생성합니다
+        var iwContent = `<div style="padding:5px;">${areaInfo.name}</div>`; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+        var iwRemoveable = true; // removeable 속성을 ture 로 설정하면 인포윈도우를 닫을 수 있는 x버튼이 표시됩니다
+
+        kakao.maps.event.addListener(marker, 'click', makeOverListener(map, marker, infowindow, areaInfo));
     }
 
     // 현재 입력받은 위치 - 마커표시
@@ -126,6 +139,14 @@
         let locPosition = new kakao.maps.LatLng(37.5677463677699,126.9153946742084);
         map.setCenter(locPosition);
     }
+}
+
+function makeOverListener(map, marker, infowindow, areaInfo) {
+    return function() {
+        infowindow.setContent(areaInfo.name);
+        infowindow.setPosition(new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude));
+        infowindow.open(map,marker);
+    };
 }
 
 </script>

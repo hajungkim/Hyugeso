@@ -2,13 +2,14 @@ const express = require('express');
 const mysql = require('mysql');
 const axios = require('axios');
 const app = express();
+var expressLayouts = require('express-ejs-layouts');
 
 // DB connection
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '12qw!@QW',
-    database: 'test',
+    password: 'gksqlc12',
+    database: 'hyugeso',
 });
 
 // views
@@ -21,6 +22,9 @@ app.use(express.urlencoded({
     extended: false
 }));
 
+//layout
+app.use(expressLayouts);
+
 // 이 과정을 거쳐야 내부폴더에 있는 파일을 접근할 수 있음
 app.use(express.static(__dirname));
 
@@ -31,25 +35,29 @@ app.get('/home', function (req, res) {
 
 // 휴게소 정보 화면
 app.get('/restAreaInfo', function (req, res) {
-    res.render('restAreaInfo');
+    res.render('home/restAreaInfo');
 });
-
-// 메뉴 주문 화면
-app.get('/menu', function (req, res) {
-    res.render('menu');
+//메뉴 목록 화면
+app.get('/menulist', function(request, response) {
+    response.render('home/menulist');
 });
-
-// 결제 화면
-app.get('/orderList', function(req, res) {
-    res.render('orderList');
-})
+//메뉴고르고 결제할때 화면
+app.get('/payment', function(request, response) {
+    response.render('home/payment');
+});
+//장바구니 화면
+app.get('/cart', function(request, response) {
+    response.render('cart/cart');
+});
+//주문했었던 목록 화면(주문번호, 주문내역 확인)
+app.get('/orderlist', function(request, response) {
+    response.render('orderlist/orderlist');
+});
 
 // 서버 Start
 app.listen(3000, function () {
     console.log('example app listening at http://localhost:3000')
 });
-
-
 
 
 

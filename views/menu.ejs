@@ -11,18 +11,17 @@
     ></script>
   </head>
   <body>
-    <form action="/orderList">
+    <form id='orderListForm' action="/orderList">
       <div class="">
-        <div class="">
-          <h4>주문하기</h4>
-        </div>
-        <ul id='listItems' class="">
-            <!-- 해당 휴게소의 메뉴 내용 -->
+        <h4>주문하기</h4>
+      </div>
+      <div id='menuList' style="width: 40%; height: 300px; overflow: scroll; overflow-x: hidden">
+        <ul id='listItems'>
+            <!-- 휴게소 목록 리스트 -->
         </ul>
       </div>
       <input type="submit" value="결제하기" />
-    </form>
-    
+   </form>
   </body>
 </html>
 
@@ -70,8 +69,8 @@
             
             const input = document.createElement('input');
             input.type = 'checkbox';
-            input.name = 'foodNm';
-            input.value = data[i].foodNm; 
+            input.name = 'menuInfo';
+            input.value = (data[i].foodNm + '@' + data[i].foodCost);
             
             const namespan = document.createElement('span');
             namespan.innerHTML = data[i].foodNm;

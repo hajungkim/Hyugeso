@@ -14,13 +14,13 @@
     <div id="kakaoMap" style="width: 40%; height: 400px;"></div>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d698315979c98f65a32752dc88bd959d"></script>
 
-    <div id='restareaList' style="width: 40%; height: 400px; overflow: scroll; overflow-x: hidden">
-      <form action="/restAreaInfo">
+    <form id='restareaForm' action="/restAreaInfo">
+      <div id='restareaList' style="width: 40%; height: 300px; overflow: scroll; overflow-x: hidden">
         <ul id='listItems'>
             <!-- 휴게소 목록 리스트 -->
         </ul>
-      </form>
-    </div>
+      </div>
+   </form>
   </body>
 </html>
 
@@ -39,6 +39,7 @@
 
     // 휴게소 목록 리스트 그리기
     function drawList(results) {
+        const form = document.getElementById('restareaForm');
         const ul = document.getElementById('listItems');
         const submit = document.createElement('input');
         submit.type = 'submit';
@@ -52,7 +53,7 @@
             label.innerHTML = results[i].area_nm;
 
             const input = document.createElement('input');
-            input.type = 'checkbox';
+            input.type = 'radio';
             input.id = results[i].area_code;
             input.name = 'area_code';
             input.value = results[i].area_code;
@@ -64,7 +65,7 @@
             ul.appendChild(li);
             ul.appendChild(br);
         }
-        ul.appendChild(submit);
+        form.appendChild(submit);
     }
 
     // 지도그리기

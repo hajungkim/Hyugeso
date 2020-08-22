@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require("mysql");
 const axios = require("axios");
 const app = express();
-var expressLayouts = require('express-ejs-layouts');
+var expressLayouts = require("express-ejs-layouts");
 
 // DB connection
 const connection = mysql.createConnection({
@@ -36,27 +36,25 @@ app.get("/home", function (req, res) {
 });
 
 // 휴게소 정보 화면
-<<<<<<< HEAD
-app.get('/restAreaInfo', function (req, res) {
-    res.render('home/restAreaInfo');
+app.get("/restAreaInfo", function (req, res) {
+  res.render("home/restAreaInfo");
 });
 //메뉴 목록 화면
-app.get('/menulist', function(request, response) {
-    response.render('home/menulist');
+app.get("/menulist", function (request, response) {
+  response.render("home/menulist");
 });
 //메뉴고르고 결제할때 화면
-app.get('/payment', function(request, response) {
-    response.render('home/payment');
+app.get("/payment", function (request, response) {
+  response.render("home/payment");
 });
 //장바구니 화면
-app.get('/cart', function(request, response) {
-    response.render('cart/cart');
+app.get("/cart", function (request, response) {
+  response.render("cart/cart");
 });
 //주문했었던 목록 화면(주문번호, 주문내역 확인)
-app.get('/orderlist', function(request, response) {
-    response.render('orderlist/orderlist');
+app.get("/orderlist", function (request, response) {
+  response.render("orderlist/orderlist");
 });
-=======
 app.get("/restAreaInfo", function (req, res) {
   res.render("restAreaInfo");
 });
@@ -70,18 +68,12 @@ app.get("/menu", function (req, res) {
 app.get("/orderList", function (req, res) {
   res.render("orderList");
 });
->>>>>>> 627d6b0a5cded29519aa934b559684bb8aa4ab4e
 
 // 서버 Start
 app.listen(3000, function () {
   console.log("example app listening at http://localhost:3000");
 });
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 627d6b0a5cded29519aa934b559684bb8aa4ab4e
 // 사용자 앱에서 휴게서 위도,경도 요청시 값 보내주기 - 홈 화면(지도, 리스트)
 app.post("/requestRestAreaLatLong", function (req, res) {
   connection.query(

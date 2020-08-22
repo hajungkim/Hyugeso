@@ -11,21 +11,8 @@
     ></script>
   </head>
   <body>
-    <div id="googleMap" style="width: 40%; height: 400px;"></div>
-
-    <script>
-      function myMap() {
-        var mapProp = {
-          center: new google.maps.LatLng(51.508742, -0.12085),
-          zoom: 5,
-        };
-        var map = new google.maps.Map(
-          document.getElementById("googleMap"),
-          mapProp
-        );
-      }
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBiMcetkucd-0rpow73V9VqJ_iOkuvw44E&callback=myMap"></script>
+    <div id="kakaoMap" style="width: 40%; height: 400px;"></div>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d698315979c98f65a32752dc88bd959d"></script>
 
     <div id='restareaList' style="width: 40%; height: 400px; overflow: scroll; overflow-x: hidden">
       <form action="/restAreaInfo">
@@ -46,6 +33,7 @@
             const results = JSON.parse(data);
             // console.log(result);
             drawList(results);
+            drawMarker(results);
         }
     })
 
@@ -78,4 +66,66 @@
         }
         ul.appendChild(submit);
     }
+
+    // 지도그리기
+    function drawMarker(data) {
+    var data = data;
+    // var mapContainer = document.createElement("div");
+    var mapContainer = document.getElementById("kakaoMap");
+    var mapOption = {
+        center: new kakao.maps.LatLng(37.5677463677699,126.9153946742084), //지도의 중심좌표
+        level: 10
+    };
+    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
+    
+    // 휴게소 좌표 - 마커표시
+    for(var i in data) {
+        var areaInfo = {
+            name: data[i].area_nm,
+            code: data[i].area_code,
+            latitude: data[i].latitude,
+            longitude: data[i].longitude,
+        }
+        // console.log(areaInfo);
+
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude),
+            title: areaInfo.name
+        });
+
+        marker.setMap(map);
+    }
+
+    // 현재 입력받은 위치 - 마커표시
+    if(navigator.geolocation) {
+        navigator.geolocation.watchPosition(function(position){
+            // 마커 커스텀
+            var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png', // 마커이미지의 주소입니다    
+                imageSize = new kakao.maps.Size(32, 30), // 마커이미지의 크기입니다
+                imageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+      
+            // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+            var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+            let lat = position.coords.latitude,
+                lon = position.coords.longitude;
+
+            // 현재 위치를 중심으로 지도 생성
+            map.setCenter(new kakao.maps.LatLng(lat, lon));
+
+            // 마커 위치
+            var markerPosition  = new kakao.maps.LatLng(lat, lon); 
+            var marker = new kakao.maps.Marker({
+                position:markerPosition,
+                image: markerImage // 마커이미지 설정 
+            });
+            marker.setMap(map);
+        });
+    } else{
+        let locPosition = new kakao.maps.LatLng(37.5677463677699,126.9153946742084);
+        map.setCenter(locPosition);
+    }
+}
+
 </script>

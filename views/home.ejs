@@ -11,7 +11,8 @@
     ></script>
   </head>
   <body>
-    <div id="kakaoMap" style="width: 40%; height: 400px;"></div>
+    <div id="kakaoMap" style="width: 40%; height: 400px;">
+    </div>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d698315979c98f65a32752dc88bd959d"></script>
 
     <div id='restareaList' style="width: 40%; height: 400px; overflow: scroll; overflow-x: hidden">
@@ -144,10 +145,11 @@ function makeOverListener(map, marker, infowindow, areaInfo) {
                         ${areaInfo.name}
                          <div class="close" onclick="closeOverlay()" title="닫기"></div>    
                      </div>    
-                     <div class="body">    
-                         <div class="desc">    
-                             <div><a href="http://localhost:3000/restAreaInfo?area_code=${areaInfo.code}" target="_blank" class="link">휴게소정보</a></div>    
-                         </div>    
+                     <div class="body">
+                        <form action="/restAreaInfo">
+                            <input style="display:none" id = "area_code" name = "area_code" value = ${areaInfo.code}>
+                            <input type="submit" value='휴게소정보'>
+                        </form>
                      </div>    
                  </div>       
              </div>`
@@ -156,5 +158,7 @@ function makeOverListener(map, marker, infowindow, areaInfo) {
         infowindow.open(map,marker);
     };
 }
+
+//http://localhost:3000/restAreaInfo?area_code=RA001
 
 </script>

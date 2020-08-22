@@ -1,23 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RestAreaInfo</title>
-    <script
-      src="https://code.jquery.com/jquery-3.5.1.min.js"
-      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <div id='restAreaInfoData'>
-        <!-- 휴게소 정보 출력 -->
-    </div>
-    <button id='btnMenu'>주문하기</button>
-  </body>
-</html>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+</head>
 
+<body>
+    <div class="page-header">
+        <h3>휴게소정보</h3>
+    </div>
+    <div class="card" style="width: 50rem;">
+        <div class="card-body">
+            <div>
+                <h5>휴게소명
+                    <small>
+                        건천(부산) 휴게소
+                    </small>
+                </h5>
+                <h5>주소
+                    <small>
+                        경북 경주시 건천읍 경부고속도로 77
+                    </small>
+                </h5>
+                <h5>본부명
+                    <small>
+                        대구경북본부
+                    </small>
+                </h5>
+                <h5>노선명
+                    <small>
+                        경부선
+                    </small>
+                </h5>
+                <h5>전화번호
+                    <small>
+                        033-648-8850
+                    </small>
+                </h5>
+                <h5>운영시간
+                    <small>
+                        00:00 ~ 23:59
+                    </small>
+                </h5>
+                <div>
+                    <button class="btn btn-info">주문하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
 
 <!-- 휴게소 선택 후, 휴게소 정보 버튼 클릭시 -->
 <script>
@@ -32,15 +69,15 @@
         data: {
             area_code: areaCode, // 여기로 휴게소 코드 넘겨 주어야 합니다
         },
-        success: function(data) {
+        success: function (data) {
             const results = JSON.parse(data);
             areaName = results[0].area_nm;
             drawInfoPage(results[0]);
         }
     });
-    
+
     // 주문버튼 눌렀을때 휴게소 이름 넘겨주기
-    $('#btnMenu').click( function() {
+    $('#btnMenu').click(function () {
         window.location.href = '/menu?area_nm=' + areaName;
     });
 
@@ -48,7 +85,7 @@
     function getQueryStringObject() {
         var a = window.location.search.substr(1).split('&');
         if (a == "") return {};
-            var b = {};
+        var b = {};
         for (var i = 0; i < a.length; ++i) {
             var p = a[i].split('=', 2);
             if (p.length == 1) {
@@ -64,13 +101,13 @@
     function drawInfoPage(results) {
         const div = document.getElementById('restAreaInfoData');
         const h1 = document.createElement('h1');
-        for(key in results) {
+        for (key in results) {
             const p = document.createElement('p');
-            if(key == 'area_nm') {
+            if (key == 'area_nm') {
                 h1.innerHTML = key + ': ' + results[key];
                 div.appendChild(h1);
             } else {
-                p.innerHTML = key + ': ' +results[key];
+                p.innerHTML = key + ': ' + results[key];
                 div.appendChild(p);
             }
         }

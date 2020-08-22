@@ -21,7 +21,8 @@
                 <h3>장바구니</h3>
             </div>
             <div class="well">
-                <div class="panel-group">
+                <!-- id에 음식 seq 넣어주세요 -->
+                <div class="panel-group" id="seq"> 
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <input type="checkbox" name="menuCheckBox" id="" />
@@ -36,16 +37,16 @@
                                         <p>수량</p>
                                     </div>
                                     <div class="col-sm-6">
-                                        <button type="button" class="btn btn-default btn-sm" name="plusBtn">
+                                        <button type="button" class="btn btn-default btn-sm minusBtn">
                                             <span class="glyphicon glyphicon-minus"></span>
                                         </button>
-                                        <input type="text" style="width: 40px;">
-                                        <button type="button" class="btn btn-default btn-sm" name="minusBtn">
+                                        <input type="number" value="0" min="0" style="width: 40px;">
+                                        <button type="button" class="btn btn-default btn-sm plusBtn">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </button>
                                     </div>
                                     <div class="col-sm-3">
-                                        <span>4000</span>원
+                                        <span id="">4000</span>원
                                     </div>
                                 </div>
                             </div>
@@ -55,7 +56,7 @@
                 <div class="panel-group">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <input type="checkbox" name="menuCheckBox" id="256"/>
+                            <input type="checkbox" name="menuCheckBox"/>
                             <span>
                                 치즈라면
                             </span>
@@ -67,11 +68,11 @@
                                         <p>수량</p>
                                     </div>
                                     <div class="col-sm-6">
-                                        <button type="button" class="btn btn-default btn-sm">
+                                        <button type="button" class="btn btn-default btn-sm minusBtn">
                                             <span class="glyphicon glyphicon-minus"></span>
                                         </button>
-                                        <input type="text" style="width: 40px;">
-                                        <button type="button" class="btn btn-default btn-sm">
+                                        <input type="number" value="0" min="0" style="width: 40px;">
+                                        <button type="button" class="btn btn-default btn-sm plusBtn">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </button>
                                     </div>
@@ -89,7 +90,7 @@
                             <h3>총 상품 가격</h3>
                         </div>
                         <div class="col-sm-3">
-                            <h3><small><span>12000</span>원</small></h3>
+                            <h3><small><span id="totalCost">12000</span>원</small></h3>
                         </div>
                     </div>
                 </div>
@@ -190,13 +191,27 @@
 
         // 장바구니 삭제
         $("#removeBtn").click(() => {
-            var checkedMenu = $("input:checked");
+            let checkedMenu = $("input:checked");
             if (checkedMenu) {
                 $("input:checked").parentsUntil(".panel-group").remove();
             }
         });
 
         // 수량 + 버튼
-        $()
+        $("#seq Button.plusBtn").click(() => {
+            let count = $("#seq Button.plusBtn").prev().val();
+            count = parseInt(count) + 1;
+            $("#seq Button.plusBtn").prev().val(count);
+
+        })
+        // 수량 - 버튼
+        $("#seq Button.minusBtn").click(() => {
+            let count = $("#seq Button.minusBtn").next().val();
+            count = parseInt(count) - 1;
+            if(count < 0) {
+                count = 0;
+            }
+            $("#seq Button.minusBtn").next().val(count);
+        })
     });
 </script>

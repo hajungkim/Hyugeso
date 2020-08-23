@@ -19,76 +19,13 @@
                 <h3>장바구니</h3>
             </div>
             <div class="well">
-                <!-- id에 음식 seq 넣어주세요 -->
-                <div class="panel-group" id="0">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <input type="checkbox" name="menuCheckBox" id="" />
-                            <span>
-                                김치찌개
-                            </span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="container" style="align-items: center;">
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <p>수량</p>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <button type="button" class="btn btn-default btn-sm minusBtn">
-                                            <span class="glyphicon glyphicon-minus"></span>
-                                        </button>
-                                        <input type="number" value="0" min="0" style="width: 40px;">
-                                        <button type="button" class="btn btn-default btn-sm plusBtn">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </button>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <span class="cost">4000</span>원
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel-group" id="1">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <input type="checkbox" name="menuCheckBox" />
-                            <span>
-                                치즈라면
-                            </span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="container" style="align-items: center;">
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <p>수량</p>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <button type="button" class="btn btn-default btn-sm minusBtn">
-                                            <span class="glyphicon glyphicon-minus"></span>
-                                        </button>
-                                        <input type="number" value="0" min="0" style="width: 40px;">
-                                        <button type="button" class="btn btn-default btn-sm plusBtn">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </button>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <span class="cost">4000</span>원
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-9">
                             <h3>총 상품 가격</h3>
                         </div>
                         <div class="col-sm-3">
-                            <h3><small><span id="totalCost"></span>원</small></h3>
+                            <h3><small><span id="totalPrice"></span>원</small></h3>
                         </div>
                     </div>
                 </div>
@@ -109,49 +46,108 @@
 </html>
 
 <script>
+    let items = [
+        {
+            item_name: '김치찌개',
+            qty: 3,
+            unique: '123',
+            price: 4000
+        },
+        {
+            item_name: '치즈라면',
+            qty: 6,
+            unique: '345',
+            price: 4000
+        },
+        {
+            item_name: '해물라면',
+            qty: 6,
+            unique: '234',
+            price: 4000
+        }
+    ];
     $(() => {
+        for (item of items) {
+            $(".well").prepend(
+                `<div class="panel-group">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <input type="checkbox" name="menuCheckBox"/>
+                            <span>
+                                ${item.item_name}
+                            </span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="container" style="align-items: center;">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <p>수량</p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button type="button" class="btn btn-default btn-sm" id="${item.unique}minusBtn">
+                                            <span class="glyphicon glyphicon-minus"></span>
+                                        </button>
+                                        <input type="number" id="${item.unique}input" value="${item.qty}" min="0" style="width: 40px;">
+                                        <button type="button" class="btn btn-default btn-sm" id="${item.unique}plusBtn">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <span id="${item.unique}price">${item.price * item.qty}</span>원
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`)
+        }
+
+        //수량 + 버튼
+        for (let i = 0; i < items.length; i++) {
+            $(`#${items[i].unique}plusBtn`).click(() => {
+                let count = $(`#${items[i].unique}input`).val(); // 수량
+                let price = 4000; // 음식 가격
+
+                count = parseInt(count) + 1;
+                price = parseInt(price) * count;
+
+                $(`#${items[i].unique}input`).val(count);
+                $(`#${items[i].unique}price`).text(price);
+            })
+            // 수량 - 버튼
+            $(`#${items[i].unique}minusBtn`).click(() => {
+                let count = $(`#${items[i].unique}input`).val(); // 수량
+                let price = 4000; // 음식 가격
+
+                count = parseInt(count) - 1;
+                if (count < 0) {
+                    count = 0;
+                }
+
+                price = parseInt(price) * count;
+                $(`#${items[i].unique}input`).val(count);
+                $(`#${items[i].unique}price`).text(price);
+            })
+        }
+
         // 결제하기
         $("#payBtn").click(() => {
             BootPay.request({
                 price: '1000', //실제 결제되는 가격
                 application_id: '5f34ea102fa5c20025eecac0',
-                name: '블링블링 마스카라', //결제창에서 보여질 이름
+                name: '건천(부산) 휴게소', //결제창에서 보여질 이름
                 pg: '',
                 method: '', //결제수단, 입력하지 않으면 결제수단 선택부터 화면이 시작합니다.
                 show_agree_window: 0, // 부트페이 정보 동의 창 보이기 여부
                 items: [
                     {
-                        item_name: '나는 아이템', //상품명
+                        item_name: '김치찌개', //상품명
                         qty: 1, //수량
                         unique: '123', //해당 상품을 구분짓는 primary key
                         price: 1000, //상품 단가
-                        cat1: 'TOP', // 대표 상품의 카테고리 상, 50글자 이내
-                        cat2: '티셔츠', // 대표 상품의 카테고리 중, 50글자 이내
-                        cat3: '라운드 티', // 대표상품의 카테고리 하, 50글자 이내
                     },
                 ],
-                user_info: {
-                    username: '사용자 이름',
-                    email: '사용자 이메일',
-                    addr: '사용자 주소',
-                    phone: '010-1234-4567',
-                },
                 order_id: '고유order_id_1234', //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
-                params: {
-                    callback1: '그대로 콜백받을 변수 1',
-                    callback2: '그대로 콜백받을 변수 2',
-                    customvar1234: '변수명도 마음대로',
-                },
-                account_expire_at: '2018-05-25', // 가상계좌 입금기간 제한 ( yyyy-mm-dd 포멧으로 입력해주세요. 가상계좌만 적용됩니다. )
-                extra: {
-                    start_at: '2019-05-10', // 정기 결제 시작일 - 시작일을 지정하지 않으면 그 날 당일로부터 결제가 가능한 Billing key 지급
-                    end_at: '2022-05-10', // 정기결제 만료일 -  기간 없음 - 무제한
-                    vbank_result: 1, // 가상계좌 사용시 사용, 가상계좌 결과창을 볼지(1), 말지(0), 미설정시 봄(1)
-                    quota: '0,2,3', // 결제금액이 5만원 이상시 할부개월 허용범위를 설정할 수 있음, [0(일시불), 2개월, 3개월] 허용, 미설정시 12개월까지 허용,
-                    theme: 'purple', // [ red, purple(기본), custom ]
-                    custom_background: '#00a086', // [ theme가 custom 일 때 background 색상 지정 가능 ]
-                    custom_font_color: '#ffffff', // [ theme가 custom 일 때 font color 색상 지정 가능 ]
-                },
             })
                 .error(function (data) {
                     //결제 진행시 에러가 발생하면 수행됩니다.
@@ -194,37 +190,5 @@
                 $("input:checked").parentsUntil(".panel-group").remove();
             }
         });
-
-        // 임의의 음식 seq 값을 1, 2로 했을 경우 ==> 나중에 바꿔야함
-        for (let i = 0; i < 2; i++) {
-
-            // 수량 + 버튼
-            $(`#${i} Button.plusBtn`).click(() => {
-                let count = $(`#${i} Button.plusBtn`).prev().val(); // 수량
-                let cost = 4000; // 음식 가격
-
-                count = parseInt(count) + 1;
-                cost = parseInt(cost) * count;
-
-                $(`#${i} Button.plusBtn`).prev().val(count);
-                $(`#${i} Button.plusBtn`).parent().next().children().text(cost);
-
-            })
-
-            // 수량 - 버튼
-            $(`#${i} Button.minusBtn`).click(() => {
-                let count = $(`#${i} Button.minusBtn`).next().val(); // 수량
-                let cost = 4000; // 음식 가격
-
-                count = parseInt(count) - 1;
-                if (count < 0) {
-                    count = 0;
-                }
-
-                $(`#${i} Button.minusBtn`).next().val(count);
-                cost = parseInt(cost) * count;
-                $(`#${i} Button.minusBtn`).parent().next().children().text(cost);
-            })
-        }
     });
 </script>

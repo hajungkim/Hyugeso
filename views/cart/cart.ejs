@@ -46,6 +46,7 @@
 </html>
 
 <script>
+    // 장바구니에 담을 상품
     let items = [
         {
             item_name: '김치찌개',
@@ -67,6 +68,7 @@
         }
     ];
     $(() => {
+        // 메뉴 개수에 따른 장바구니 목록 출력
         for (item of items) {
             $(".well").prepend(
                 `<div class="panel-group">
@@ -101,32 +103,35 @@
                     </div>
                 </div>`)
         }
-
-        //수량 + 버튼
+        // 메뉴마다 + - 버튼 기능 추가하기
         for (let i = 0; i < items.length; i++) {
+            //수량 + 버튼
             $(`#${items[i].unique}plusBtn`).click(() => {
                 let count = $(`#${items[i].unique}input`).val(); // 수량
-                let price = 4000; // 음식 가격
+                let price = items[i].price; // 음식 가격
 
                 count = parseInt(count) + 1;
                 price = parseInt(price) * count;
 
-                $(`#${items[i].unique}input`).val(count);
-                $(`#${items[i].unique}price`).text(price);
+
+                $(`#${items[i].unique}input`).val(count); // 삽입
+                $(`#${items[i].unique}price`).text(price); // 삽입
             })
             // 수량 - 버튼
             $(`#${items[i].unique}minusBtn`).click(() => {
                 let count = $(`#${items[i].unique}input`).val(); // 수량
-                let price = 4000; // 음식 가격
+                let price = items[i].price; // 음식 가격
 
                 count = parseInt(count) - 1;
+                
                 if (count < 0) {
                     count = 0;
                 }
-
+                
                 price = parseInt(price) * count;
-                $(`#${items[i].unique}input`).val(count);
-                $(`#${items[i].unique}price`).text(price);
+
+                $(`#${items[i].unique}input`).val(count); // 삽입
+                $(`#${items[i].unique}price`).text(price); // 삽입
             })
         }
 

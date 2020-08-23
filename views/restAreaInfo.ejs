@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RestAreaInfo</title>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
     <script
       src="https://code.jquery.com/jquery-3.5.1.min.js"
       integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
@@ -11,10 +12,17 @@
     ></script>
   </head>
   <body>
-    <div id='restAreaInfoData'>
+    <br/>
+    <div id='restAreaInfoData' >
         <!-- 휴게소 정보 출력 -->
     </div>
-    <button id='btnMenu'>주문하기</button>
+    <br/>
+    <div id="map" style="width:500px;height:350px;margin-left:70px;"></div>
+
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ce3d51b6e9cedc8c27e726793e8cbcb5"></script>
+    <br/>
+    <br/>
+    <button id='btnMenu' style="margin-left:10px;">주문하기</button>
   </body>
 </html>
 
@@ -24,6 +32,7 @@
     const qs = getQueryStringObject();
     let areaCode = qs.area_code;
     let areaName;
+    
 
     // 휴게소 정보 읽어오기 ajax
     $.ajax({
@@ -35,7 +44,9 @@
         success: function(data) {
             const results = JSON.parse(data);
             areaName = results[0].area_nm;
-            drawInfoPage(results[0]);
+            //drawInfoPage(results[0]);
+            drawTable(results[0]);
+            drawMap(results[0]);
         }
     });
     
@@ -60,19 +71,121 @@
         return b;
     }
 
-    // 받아온 데이터로 휴게소 정보 그리기
-    function drawInfoPage(results) {
-        const div = document.getElementById('restAreaInfoData');
-        const h1 = document.createElement('h1');
-        for(key in results) {
-            const p = document.createElement('p');
-            if(key == 'area_nm') {
-                h1.innerHTML = key + ': ' + results[key];
-                div.appendChild(h1);
-            } else {
-                p.innerHTML = key + ': ' +results[key];
-                div.appendChild(p);
+    function drawTable(results) {
+        const div1 = document.getElementById('restAreaInfoData');
+        const style = 
+        `<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-bottom-width:1px;border-color:black;border-style:solid;border-top-width:1px;border-width:0px;
+  font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-bottom-width:1px;border-color:black;border-style:solid;border-top-width:1px;border-width:0px;
+  font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-h5uz{border-color:inherit;font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;
+  vertical-align:middle}
+.tg .tg-2bcv{border-color:inherit;font-family:"Lucida Console", Monaco, monospace !important;;font-size:"36px";text-align:center;
+  vertical-align:middle}
+.tg .tg-5ic9{border-color:#000000;font-family:"Lucida Console", Monaco, monospace !important;;font-size:36px;text-align:center;
+  vertical-align:middle}
+.tg .tg-z5o4{font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;vertical-align:middle}
+.tg .tg-qnu5{border-color:#000000;font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;
+  vertical-align:middle}
+.tg .tg-x7t6{background-color:#9b9b9b;border-color:#c0c0c0;font-family:"Lucida Console", Monaco, monospace !important;;
+  text-align:center;vertical-align:middle}
+</style>`;
+        const thead =
+        `<thead>
+            <tr>
+                <th>${results['road_nm']}고속도로 제${results['road_no']}호선</th>
+            </tr>
+            <tr style = "height:70px" />
+        </thead>`;
+        
+        const tbody_parking =
+        `<tr>
+            <th>주차 공간</th>
+            <td><img src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'%3e%3cpath fill='%23000000' d='M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zM240 320h-48v48c0 8.8-7.2 16-16 16h-32c-8.8 0-16-7.2-16-16V144c0-8.8 7.2-16 16-16h96c52.9 0 96 43.1 96 96s-43.1 96-96 96zm0-128h-48v64h48c17.6 0 32-14.4 32-32s-14.4-32-32-32z'/%3e%3c/svg%3e" width="30" height="30"></td>
+            <td style = "width:50px">${results['parking_space_cnt']}석</td>
+        </tr>
+        <tr style = "height:30px"></tr>`;
+        
+        const conv_yn = [results['restroom_yn'], results['pharmacy_yn'], results['lpg_yn'], results['gas_yn'], results['electric_yn']];
+        const conv_img = [
+            `<td style = "width:50px"><img src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'%3e%3cpath fill='%23000000' d='M128 128c35.3 0 64-28.7 64-64S163.3 0 128 0 64 28.7 64 64s28.7 64 64 64zm384 0c35.3 0 64-28.7 64-64S547.3 0 512 0s-64 28.7-64 64 28.7 64 64 64zm127.3 226.5l-45.6-185.8c-3.3-13.5-15.5-23-29.8-24.2-15 9.7-32.8 15.5-52 15.5-19.2 0-37-5.8-52-15.5-14.3 1.2-26.5 10.7-29.8 24.2l-45.6 185.8C381 369.6 393 384 409.2 384H464v104c0 13.3 10.7 24 24 24h48c13.3 0 24-10.7 24-24V384h54.8c16.2 0 28.2-14.4 24.5-29.5zM336 0h-32c-8.8 0-16 7.2-16 16v480c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V16c0-8.8-7.2-16-16-16zM180.1 144.4c-15 9.8-32.9 15.6-52.1 15.6-19.2 0-37.1-5.8-52.1-15.6C51.3 146.5 32 166.9 32 192v136c0 13.3 10.7 24 24 24h8v136c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V352h8c13.3 0 24-10.7 24-24V192c0-25.1-19.3-45.5-43.9-47.6z'/%3e%3c/svg%3e" alt="Image" width="50" height="50"></td>
+            <td style = "width:20px"/>`,
+            `<td style = "width:50px"><img src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3e%3cpath fill='%23000000' d='M464 128h-80V80c0-26.5-21.5-48-48-48H176c-26.5 0-48 21.5-48 48v48H48c-26.5 0-48 21.5-48 48v288c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V176c0-26.5-21.5-48-48-48zM192 96h128v32H192V96zm160 248c0 4.4-3.6 8-8 8h-56v56c0 4.4-3.6 8-8 8h-48c-4.4 0-8-3.6-8-8v-56h-56c-4.4 0-8-3.6-8-8v-48c0-4.4 3.6-8 8-8h56v-56c0-4.4 3.6-8 8-8h48c4.4 0 8 3.6 8 8v56h56c4.4 0 8 3.6 8 8v48z'/%3e%3c/svg%3e" alt="Image" width="50" height="50"></td>
+            <td style = "width:20px"/>`,
+            `<td style = "width:50px"><img src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3e%3cpath fill='%23000000' d='M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z'/%3e%3c/svg%3e" alt="Image" width="50" height="50"></td>
+            <td style = "width:20px"/>`,
+            `<td style = "width:50px"><img src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3e%3cpath fill='%23000000' d='M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z'/%3e%3c/svg%3e" alt="Image" width="50" height="50"></td>
+            <td style = "width:20px"/>`,
+            `<td style = "width:50px"><img src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3e%3cpath fill='%23000000' d='M336 448H16c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16h320c8.84 0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zm208-320V80c0-8.84-7.16-16-16-16s-16 7.16-16 16v48h-32V80c0-8.84-7.16-16-16-16s-16 7.16-16 16v48h-16c-8.84 0-16 7.16-16 16v32c0 35.76 23.62 65.69 56 75.93v118.49c0 13.95-9.5 26.92-23.26 29.19C431.22 402.5 416 388.99 416 372v-28c0-48.6-39.4-88-88-88h-8V64c0-35.35-28.65-64-64-64H96C60.65 0 32 28.65 32 64v352h288V304h8c22.09 0 40 17.91 40 40v24.61c0 39.67 28.92 75.16 68.41 79.01C481.71 452.05 520 416.41 520 372V251.93c32.38-10.24 56-40.17 56-75.93v-32c0-8.84-7.16-16-16-16h-16zm-283.91 47.76l-93.7 139c-2.2 3.33-6.21 5.24-10.39 5.24-7.67 0-13.47-6.28-11.67-12.92L167.35 224H108c-7.25 0-12.85-5.59-11.89-11.89l16-107C112.9 99.9 117.98 96 124 96h68c7.88 0 13.62 6.54 11.6 13.21L192 160h57.7c9.24 0 15.01 8.78 10.39 15.76z'/%3e%3c/svg%3e" alt="Image" width="50" height="50"></td>
+            <tr></tr>`
+        ];
+
+        const conv_name = [
+            `<td>화장실</td><td style = "width:20px"/>`,
+            `<td>약국</td><td style = "width:20px"/>`,
+            `<td>LPG</td><td style = "width:20px"/>`,
+            `<td>GAS</td><td style = "width:20px"/>`,
+            `<td>전기차 충전소</td>`
+        ];
+
+        var convinence = `<th>편의시설</th>`;
+        for(var i=0; i<5;i++){
+            
+            if(conv_yn[i]=='Y'){
+                convinence += conv_img[i];
             }
         }
-    }
+        convinence += `<tr/><th/>`;
+        for(var i=0; i<5;i++){
+            
+            if(conv_yn[i]=='Y'){
+                convinence += conv_name[i];
+            }
+        }
+        
+        const pn_map = `
+        <tr style = "height:30px"></tr>
+        <tr>
+            <th>전화 번호</th>
+            <td colspan="8">${results['area_pn']}
+                <a href='tel:${results['area_pn']}'>
+                    <img src="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3e%3cpath fill='%23000000' d='M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z'/%3e%3c/svg%3e"alt="Image" width="20" height="20">
+                </a>
+            </td>
+            
+        </tr>
+        <tr style = "height:30px"></tr>
+        <tr>
+            <th>오시는 길</th>
+            <td colspan="8">
+                 
+            </td>
+            
+        </tr>
+            
+        `;
+    div1.innerHTML = style + `<table>` + thead + '<tbody>' + tbody_parking +'<tr>' +convinence+ '</tr>'+pn_map+'</tbody>' + '</table>';
+}
+</script>
+<script>
+function drawMap(results){
+    //console.log("lat : ", results['latitude'], " long : ", results['longitude']);
+    var mapContainer = document.getElementById('map'); // 지도를 표시할 div 
+    var mapOption = {
+        center: new kakao.maps.LatLng(results['latitude'],results['longitude']), //지도의 중심좌표
+        level: 5
+    };
+        // 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(results['latitude'],results['longitude']),
+            //title: areaInfo.name,
+            //clickable : true
+        });
+
+        marker.setMap(map);
+}
 </script>

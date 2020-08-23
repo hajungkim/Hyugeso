@@ -21,10 +21,10 @@
             <div class="well">
                 <div class="container">
                     <div class="row">
-                        <div class="col-sm-9">
+                        <div class="col-xs-9">
                             <h3>총 상품 가격</h3>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-xs-3">
                             <h3><small><span id="totalPrice"></span>원</small></h3>
                         </div>
                     </div>
@@ -67,14 +67,22 @@
             price: 4000
         }
     ];
+    let totalPrice = 0;
+
     $(() => {
+        // 총 가격 계산
+        for (const item of items) {
+            totalPrice = totalPrice + (item.qty * item.price);
+        }
+
+        $("#totalPrice").text(totalPrice);
         // 메뉴 개수에 따른 장바구니 목록 출력
         for (item of items) {
             $(".well").prepend(
                 `<div class="panel-group">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <input type="checkbox" name="menuCheckBox"/>
+                            <input type="checkbox" value="${item.unique}" name="menuCheckBox"/>
                             <span>
                                 ${item.item_name}
                             </span>
@@ -82,20 +90,20 @@
                         <div class="panel-body">
                             <div class="container" style="align-items: center;">
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-xs-3">
                                         <p>수량</p>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <button type="button" class="btn btn-default btn-sm" id="${item.unique}minusBtn">
+                                    <div class="col-xs-6">
+                                        <button type="button" class="btn btn-default btn-xs" id="${item.unique}minusBtn">
                                             <span class="glyphicon glyphicon-minus"></span>
                                         </button>
                                         <input type="number" id="${item.unique}input" value="${item.qty}" min="0" style="width: 40px;">
-                                        <button type="button" class="btn btn-default btn-sm" id="${item.unique}plusBtn">
+                                        <button type="button" class="btn btn-default btn-xs" id="${item.unique}plusBtn">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </button>
                                     </div>
-                                    <div class="col-sm-3">
-                                        <span id="${item.unique}price">${item.price * item.qty}</span>원
+                                    <div class="col-xs-3">
+                                        <span class="price" id="${item.unique}price">${item.price * item.qty}</span>원
                                     </div>
                                 </div>
                             </div>
@@ -112,10 +120,12 @@
 
                 count = parseInt(count) + 1;
                 price = parseInt(price) * count;
+                totalPrice = totalPrice + items[i].price;
 
-
+                items[i].qty = count;
                 $(`#${items[i].unique}input`).val(count); // 삽입
                 $(`#${items[i].unique}price`).text(price); // 삽입
+                $(`#totalPrice`).text(totalPrice); // 삽입
             })
             // 수량 - 버튼
             $(`#${items[i].unique}minusBtn`).click(() => {
@@ -123,35 +133,32 @@
                 let price = items[i].price; // 음식 가격
 
                 count = parseInt(count) - 1;
-                
+
                 if (count < 0) {
                     count = 0;
+                } else {
+                    totalPrice = totalPrice - items[i].price; // 수량이 0이면 총 가격에 변화 없음
                 }
-                
                 price = parseInt(price) * count;
 
+                items[i].qty = count;
                 $(`#${items[i].unique}input`).val(count); // 삽입
                 $(`#${items[i].unique}price`).text(price); // 삽입
+                $(`#totalPrice`).text(totalPrice); // 삽입
+
             })
         }
 
         // 결제하기
         $("#payBtn").click(() => {
             BootPay.request({
-                price: '1000', //실제 결제되는 가격
+                price: totalPrice, //실제 결제되는 가격
                 application_id: '5f34ea102fa5c20025eecac0',
                 name: '건천(부산) 휴게소', //결제창에서 보여질 이름
                 pg: '',
                 method: '', //결제수단, 입력하지 않으면 결제수단 선택부터 화면이 시작합니다.
                 show_agree_window: 0, // 부트페이 정보 동의 창 보이기 여부
-                items: [
-                    {
-                        item_name: '김치찌개', //상품명
-                        qty: 1, //수량
-                        unique: '123', //해당 상품을 구분짓는 primary key
-                        price: 1000, //상품 단가
-                    },
-                ],
+                items,
                 order_id: '고유order_id_1234', //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
             })
                 .error(function (data) {
@@ -192,7 +199,15 @@
         $("#removeBtn").click(() => {
             let checkedMenu = $("input:checked");
             if (checkedMenu) {
-                $("input:checked").parentsUntil(".panel-group").remove();
+
+                $('input:checked').each(function () {
+                    let unique = `${this.value}price`;
+                    let removedPrice = document.getElementById("" + unique + "").innerHTML;
+                    totalPrice -= removedPrice
+                })
+                $('input:checked').parentsUntil('.panel-group').remove() // 장바구니 삭제
+                $(`#totalPrice`).text(totalPrice) // 삽입
+
             }
         });
     });

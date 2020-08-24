@@ -46,7 +46,10 @@
 </html>
 
 <script>
+    const ajax = $.ajax;
     // 장바구니에 담을 상품
+    // menulist화면에서 session에 담아서, cart로 넘겨준다
+    // cart에서 session에 접근해서 list를 만든다
     let items = [
         {
             item_name: '김치찌개',
@@ -151,6 +154,7 @@
 
         // 결제하기
         $("#payBtn").click(() => {
+            // 현재 카트에 주문되어있는 값들로 리스트 생성
             BootPay.request({
                 price: totalPrice, //실제 결제되는 가격
                 application_id: '5f34ea102fa5c20025eecac0',
@@ -191,7 +195,22 @@
                 .done(function (data) {
                     //결제가 정상적으로 완료되면 수행됩니다
                     //비즈니스 로직을 수행하기 전에 결제 유효성 검증을 하시길 추천합니다.
-                    console.log(data)
+                    
+                    // 결제 완료된 데이터 서버로 넘기기
+                    ajax({
+                        url: '/insertOrderList',
+                        type: 'POST',
+                        data: {
+                            area_nm: 'XX휴게소',            // 휴게소 이름
+                            total_cost: totalPrice,         // 총 가격
+                            phone_no: '010-3101-8031',      // 주문자 번호
+                            lists: JSON.stringify(items),   // 주문 내역
+                        },
+                        success: function(data) {
+                            // 결제완료시 주문번호 리턴
+                            console.log(data);
+                        }
+                    });
                 })
         });
 

@@ -128,7 +128,7 @@ function createOrderFoodInfo (connection) {
     return new Promise( (resolve, reject) => {
     connection.query(
         `CREATE TABLE order_food_info_tb (
-            order_no varchar(15) primary key,
+            order_no varchar(15) not null,
             food_nm varchar(30) not null,
             food_price int(5) not null,
             food_cnt int(5) not null

@@ -1,31 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script
-      src="https://code.jquery.com/jquery-3.5.1.min.js"
-      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <div id="kakaoMap" style="width: 100%; height: 400px;"></div>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d698315979c98f65a32752dc88bd959d"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div id="kakaoMap" style="width: 100%; height: 400px;">
+    </div>
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d698315979c98f65a32752dc88bd959d"></script>
 
     <div id='restareaList' style="width: 100%; height: 400px; overflow: scroll; overflow-x: hidden">
-      <form action="/restAreaInfo">
-        <ul id='listItems'>
-            <!-- 휴게소 목록 리스트 -->
-        </ul>
-      </form>
+        <form action="/restAreaInfo">
+            <ul id='listItems'>
+                <!-- 휴게소 목록 리스트 -->
+            </ul>
+        </form>
     </div>
-    <div id='homeBtn' style='width:100%; height:50px; margin-top:20px;'>
-        <button id='btnInfo'>휴게소정보</button>
-        <button id='btnOrder'>음식주문</button>
-    </div>
-  </body>
+</body>
+
 </html>
 
 <!-- home 화면 로딩 되면, 휴게소좌표 찍기위해서 데이터 요청 -->
@@ -33,103 +31,162 @@
     $.ajax({
         url: '/requestRestAreaLatLong',
         type: 'POST',
-        success: function(data) {
+        success: function (data) {
             const results = JSON.parse(data);
             // console.log(result);
-            drawList(results);
             drawMarker(results);
+            drawList(results);
         }
     })
-
+    function computeDistance(startCoords, destCoords) {
+        var startLatRads = degreesToRadians(startCoords.lat);
+        var startLongRads = degreesToRadians(startCoords.lon);
+        var destLatRads = degreesToRadians(destCoords.lat);
+        var destLongRads = degreesToRadians(destCoords.lon);
+        var Radius = 6371; //지구의 반경(km)
+        var distance = Math.acos(Math.sin(startLatRads) * Math.sin(destLatRads) +
+            Math.cos(startLatRads) * Math.cos(destLatRads) *
+            Math.cos(startLongRads - destLongRads)) * Radius;
+        return distance;
+    }
+    function degreesToRadians(degrees) {
+        radians = (degrees * Math.PI) / 180;
+        return radians;
+    }
     // 휴게소 목록 리스트 그리기
     function drawList(results) {
-        const ul = document.getElementById('listItems');
-        const submit = document.createElement('input');
-        submit.type = 'submit';
-        submit.value = '휴게소 정보';
-        
-        for(i in results) {
-            const li = document.createElement('li');
-
-            const label = document.createElement('label');
-            label.for = results[i].area_code;
-            label.innerHTML = results[i].area_nm;
-
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.id = results[i].area_code;
-            input.name = 'area_code';
-            input.value = results[i].area_code;
-
-            const br = document.createElement('br');
-
-            li.appendChild(label);
-            li.appendChild(input);
-            ul.appendChild(li);
-            ul.appendChild(br);
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var currentPos = {
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude
+                }
+                const ul = document.getElementById('listItems');
+                const submit = document.createElement('input');
+                submit.type = 'submit';
+                submit.value = '휴게소 정보';
+                var result_distance = new Array(results.Size);
+                for (i in results) {
+                    var distance = {
+                        lat: results[i].latitude,
+                        lon: results[i].longitude,
+                    }
+                    result_distance[i] = new Array(2);
+                    var dis = computeDistance(currentPos, distance);
+                    result_distance[i] = [dis, i];
+                    //result_distance[i] = [calculateDistance(distance.lat, distance.lon, currentPos.lat, currentPos.lon),i];
+                }
+                result_distance.sort(sortFunction);
+                function sortFunction(a, b) {
+                    return (a[0] < b[0]) ? -1 : 1;
+                }
+                for (var i = 0; i < 5; i++) {
+                    var idx = result_distance[i][1];
+                    const li = document.createElement('li');
+                    const label = document.createElement('label');
+                    label.for = results[idx].area_code;
+                    label.innerHTML = results[idx].area_nm;
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.id = results[idx].area_code;
+                    input.name = 'area_code';
+                    input.value = results[idx].area_code;
+                    label.innerHTML += " 약 " + result_distance[i][0].toFixed(2) + "km";
+                    const br = document.createElement('br');
+                    li.appendChild(label);
+                    li.appendChild(input);
+                    ul.appendChild(li);
+                    ul.appendChild(br);
+                }
+                ul.appendChild(submit);
+            });
         }
-        ul.appendChild(submit);
-    }
+        // var currentPos = {
+        //     lat : lati,
+        //     lon : longi
+        // }
 
+    }
     // 지도그리기
     function drawMarker(data) {
-    var data = data;
-    // var mapContainer = document.createElement("div");
-    var mapContainer = document.getElementById("kakaoMap");
-    var mapOption = {
-        center: new kakao.maps.LatLng(37.5677463677699,126.9153946742084), //지도의 중심좌표
-        level: 10
-    };
-    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
-    
-    // 휴게소 좌표 - 마커표시
-    for(var i in data) {
-        var areaInfo = {
-            name: data[i].area_nm,
-            code: data[i].area_code,
-            latitude: data[i].latitude,
-            longitude: data[i].longitude,
-        }
-        // console.log(areaInfo);
-
-        var marker = new kakao.maps.Marker({
-            map: map,
-            position: new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude),
-            title: areaInfo.name
+        var data = data;
+        // var mapContainer = document.createElement("div");
+        var mapContainer = document.getElementById("kakaoMap");
+        var mapOption = {
+            center: new kakao.maps.LatLng(37.5677463677699, 126.9153946742084), //지도의 중심좌표
+            level: 10
+        };
+        var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
+        // 인포윈도우를 생성합니다
+        var infowindow = new kakao.maps.InfoWindow({
+            content: null,
+            removable: true,
         });
-
-        marker.setMap(map);
-    }
-
-    // 현재 입력받은 위치 - 마커표시
-    if(navigator.geolocation) {
-        navigator.geolocation.watchPosition(function(position){
-            // 마커 커스텀
-            var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png', // 마커이미지의 주소입니다    
-                imageSize = new kakao.maps.Size(32, 30), // 마커이미지의 크기입니다
-                imageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
-      
-            // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
-            var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
-
-            let lat = position.coords.latitude,
-                lon = position.coords.longitude;
-
-            // 현재 위치를 중심으로 지도 생성
-            map.setCenter(new kakao.maps.LatLng(lat, lon));
-
-            // 마커 위치
-            var markerPosition  = new kakao.maps.LatLng(lat, lon); 
+        // 휴게소 좌표 - 마커표시
+        for (var i in data) {
+            var areaInfo = {
+                name: data[i].area_nm,
+                code: data[i].area_code,
+                latitude: data[i].latitude,
+                longitude: data[i].longitude,
+            }
+            // console.log(areaInfo);
             var marker = new kakao.maps.Marker({
-                position:markerPosition,
-                image: markerImage // 마커이미지 설정 
+                map: map,
+                position: new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude),
+                title: areaInfo.name,
+                clickable: true
             });
             marker.setMap(map);
-        });
-    } else{
-        let locPosition = new kakao.maps.LatLng(37.5677463677699,126.9153946742084);
-        map.setCenter(locPosition);
-    }
-}
+            kakao.maps.event.addListener(marker, 'click', makeOverListener(map, marker, infowindow, areaInfo));
+        }
+        // 현재 입력받은 위치 - 마커표시
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(function (position) {
+                // 마커 커스텀
+                var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png', // 마커이미지의 주소입니다    
+                    imageSize = new kakao.maps.Size(32, 30), // 마커이미지의 크기입니다
+                    imageOption = { offset: new kakao.maps.Point(27, 69) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
+                // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+                var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+                let lat = position.coords.latitude,
+                    lon = position.coords.longitude;
+                // 현재 위치를 중심으로 지도 생성
+                map.setCenter(new kakao.maps.LatLng(lat, lon));
+                // 마커 위치
+                var markerPosition = new kakao.maps.LatLng(lat, lon);
+                var marker = new kakao.maps.Marker({
+                    position: markerPosition,
+                    image: markerImage // 마커이미지 설정 
+                });
+                marker.setMap(map);
+                //drawList(data, position);
+            });
+        } else {
+            let locPosition = new kakao.maps.LatLng(37.5677463677699, 126.9153946742084);
+            map.setCenter(locPosition);
+        }
+    }
+    function makeOverListener(map, marker, infowindow, areaInfo) {
+        return function () {
+            var iwContent = `<div class="wrap">
+                 <div class="info">    
+                     <div class="title">    
+                        ${areaInfo.name}
+                         <div class="close" onclick="closeOverlay()" title="닫기"></div>    
+                     </div>    
+                     <div class="body">
+                        <form action="/restAreaInfo">
+                            <input style="display:none" id = "area_code" name = "area_code" value = ${areaInfo.code}>
+                            <input type="submit" value='휴게소정보'>
+                        </form>
+                     </div>    
+                 </div>       
+             </div>`
+            infowindow.setContent(iwContent);
+            infowindow.setPosition(new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude));
+            infowindow.open(map, marker);
+        };
+    }
 </script>

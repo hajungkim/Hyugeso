@@ -82,7 +82,7 @@
                 `<div class="panel-group">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <input type="checkbox" value="${item.unique}" name="menuCheckBox"/>
+                            <input type="checkbox" id="${item.unique}" value="${item.unique}" name="menuCheckBox"/>
                             <span>
                                 ${item.item_name}
                             </span>
@@ -201,14 +201,32 @@
             if (checkedMenu) {
 
                 $('input:checked').each(function () {
-                    let unique = `${this.value}price`;
-                    let removedPrice = document.getElementById("" + unique + "").innerHTML;
-                    totalPrice -= removedPrice
+                    var unique = `${this.value}price`;
+                    var removedPrice = document.getElementById("" + unique + "").innerHTML;
+                    totalPrice -= removedPrice;
                 })
-                $('input:checked').parentsUntil('.panel-group').remove() // 장바구니 삭제
-                $(`#totalPrice`).text(totalPrice) // 삽입
-
+                $('input:checked').parentsUntil('.panel-group').remove(); // 장바구니 삭제
+                $(`#totalPrice`).text(totalPrice); // 삽입
             }
         });
     });
 </script>
+<!--
+    $("#removeBtn").click(() => {
+        let checkedMenu = $("input:checked");
+        if (checkedMenu) {
+            $('input:checked').each(() => {
+                let index = items.findIndex((value, index, array) => {
+                    return value.unique === $('input:checked').val();
+                }) 
+                console.log(index)
+                totalPrice = parseInt(totalPrice) - (items[index].qty * items[index].price)
+            console.log(items.pop(index));
+            //   let removedPrice = document.getElementById("" + unique + "").innerHTML;
+            //   totalPrice -= removedPrice
+        })
+        $('input:checked').parentsUntil('.panel-group').remove() // 장바구니 삭제
+        $(`#totalPrice`).text(totalPrice) // 삽입
+    }
+});
+-->

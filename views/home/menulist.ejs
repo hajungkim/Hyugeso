@@ -26,7 +26,7 @@
     <div class="row">
       <nav class="col-3 col-sm-2" id="verticalScrollspy">
         <ul class="nav flex-column nav-pills">
-          <li class="nav-item"><a class="nav-link active" href="#item1">한식당</a></li>
+          <li class="nav-item"><a class="nav-link active" href="#item1">전체메뉴</a></li>
           <li class="nav-item"><a class="nav-link" href="#item2">라면</a></li>
           <li class="nav-item"><a class="nav-link" href="#item3">돈까스</a></li>
           <li class="nav-item"><a class="nav-link" href="#item4">우동</a></li>
@@ -35,9 +35,9 @@
         </ul>
       </nav>
       <div class="col-9 col-sm-10">
-        <h1 id="item1">한식당</h1>
+        <h2 id="item1" style="padding-left: 20px">전체메뉴</h2> <br>
         <div id="display" class="container-fluid">
-          여기에 출력
+          <!--메뉴리스트 출력-->
         </div>
         <div class="container-fluid">
           <h1 id="item2">라면</h1>
@@ -131,7 +131,7 @@
   <!-- 메뉴 리스트 읽어오기 -->
   <script>
     const qs = getQueryStringObject();
-    const areaName = "서울만남(부산)휴게소";  //휴게소 이름 가져와야함
+    const areaName = qs.area_nm;  //휴게소 이름 가져와야함
 
     // 서버에서 메뉴 정보 가져오기
     $.ajax({
@@ -162,11 +162,10 @@
         html += "<div class='container'>";
         html += "<div class='row'>";
         html += "<a href='#' class='btn btn-primary'>장바구니</a>";
-        html += "<a href='#' class='btn btn-primary'>주문하기</a>";
         html += "</div>";
         html += "</div>";
         html += "</div>";
-        html += "</div>";
+        html += "</div> <br>";
       });
       $("#display").empty();
       $("#display").append(html);

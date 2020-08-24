@@ -121,6 +121,23 @@ app.post("/requestMenuInfo", async function (req, res) {
   res.send(results);
 });
 
+
+// 사용자 번호 입력받아서 주문내역 반환
+app.post("/requestOrderList", function (req, res) {
+  const phone_no = req.body.phone_no;
+  var formatted = phone_no.slice(0, 3) + '-' + phone_no.slice(3, 7) + '-' + phone_no.slice(7);
+  console.log(formatted);
+
+  connection.query('SELECT * FROM order_info_tb WHERE orderer_pn = ?', [formatted], function(error, result, fields) {
+    if(error) { 
+      throw error;
+    } else {
+      res.send(result);      
+    }
+  });
+})
+
+
 // 메뉴API(공공데이터) 사용해서 메뉴 가져오기
 getMenuInfo = async (areaName) => {
   const API_KEY = "7027848923";
@@ -142,7 +159,6 @@ getMenuInfo = async (areaName) => {
   // console.log(res.data.list);
   return res.data.list;
 };
-
 
 // 결제완료시 음식 주문내역 DB에 삽입
 app.post('/insertOrderList', async function(req, res) {

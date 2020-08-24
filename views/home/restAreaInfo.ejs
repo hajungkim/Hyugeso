@@ -11,18 +11,17 @@
 </head>
 
 <body>
-    <br />
+    <button id="btnMenu" class="btn btn-info" style="margin-left: 550px;">주문하기</button>
     <div id='restAreaInfoData'>
+
         <!-- 휴게소 정보 출력 -->
     </div>
     <br />
     <div id="map" style="width:500px;height:350px;margin-left:70px;"></div>
-
     <script type="text/javascript"
         src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ce3d51b6e9cedc8c27e726793e8cbcb5"></script>
     <br />
     <br />
-    <button id='btnMenu' style="margin-left:10px;">주문하기</button>
 </body>
 
 </html>
@@ -45,6 +44,7 @@
         success: function (data) {
             const results = JSON.parse(data);
             areaName = results[0].area_nm;
+            console.log(results);
             //drawInfoPage(results[0]);
             drawTable(results[0]);
             drawMap(results[0]);
@@ -53,7 +53,7 @@
 
     // 주문버튼 눌렀을때 휴게소 이름 넘겨주기
     $('#btnMenu').click(function () {
-        window.location.href = '/menu?area_nm=' + areaName;
+        window.location.href = '/menulist?area_nm=' + areaName;
     });
     // qs로 보내준 데이터를(? 이후 데이터) key : value 방식으로 자바스크립트obj 로 풀어주는 함수
     function getQueryStringObject() {
@@ -70,31 +70,35 @@
         }
         return b;
     }
+
     function drawTable(results) {
         const div1 = document.getElementById('restAreaInfoData');
         const style =
             `<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{border-bottom-width:1px;border-color:black;border-style:solid;border-top-width:1px;border-width:0px;
-  font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-bottom-width:1px;border-color:black;border-style:solid;border-top-width:1px;border-width:0px;
-  font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-h5uz{border-color:inherit;font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;
-  vertical-align:middle}
-.tg .tg-2bcv{border-color:inherit;font-family:"Lucida Console", Monaco, monospace !important;;font-size:"36px";text-align:center;
-  vertical-align:middle}
-.tg .tg-5ic9{border-color:#000000;font-family:"Lucida Console", Monaco, monospace !important;;font-size:36px;text-align:center;
-  vertical-align:middle}
-.tg .tg-z5o4{font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;vertical-align:middle}
-.tg .tg-qnu5{border-color:#000000;font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;
-  vertical-align:middle}
-.tg .tg-x7t6{background-color:#9b9b9b;border-color:#c0c0c0;font-family:"Lucida Console", Monaco, monospace !important;;
-  text-align:center;vertical-align:middle}
-</style>`;
+            .tg  {border-collapse:collapse;border-spacing:0;}
+            .tg td{border-bottom-width:1px;border-color:black;border-style:solid;border-top-width:1px;border-width:0px;
+            font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
+            .tg th{border-bottom-width:1px;border-color:black;border-style:solid;border-top-width:1px;border-width:0px;
+            font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+            .tg .tg-h5uz{border-color:inherit;font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;
+            vertical-align:middle}
+            .tg .tg-2bcv{border-color:inherit;font-family:"Lucida Console", Monaco, monospace !important;;font-size:"36px";text-align:center;
+            vertical-align:middle}
+            .tg .tg-5ic9{border-color:#000000;font-family:"Lucida Console", Monaco, monospace !important;;font-size:36px;text-align:center;
+            vertical-align:middle}
+            .tg .tg-z5o4{font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;vertical-align:middle}
+            .tg .tg-qnu5{border-color:#000000;font-family:"Lucida Console", Monaco, monospace !important;;text-align:center;
+            vertical-align:middle}
+            .tg .tg-x7t6{background-color:#9b9b9b;border-color:#c0c0c0;font-family:"Lucida Console", Monaco, monospace !important;;
+            text-align:center;vertical-align:middle}
+            </style>`;
         const thead =
             `<thead>
             <tr>
-                <th>${results['road_nm']}고속도로 제${results['road_no']}호선</th>
+                <th>
+                    <h3>${results['area_nm']} 휴게소</h3>
+                    <p style="padding-left: 100px">${results['road_nm']}고속도로 제${results['road_no']}호선</p>
+                </th>
             </tr>
             <tr style = "height:70px" />
         </thead>`;

@@ -71,13 +71,11 @@
         }
     ];
     let totalPrice = 0;
-
     $(() => {
         // 총 가격 계산
         for (const item of items) {
             totalPrice = totalPrice + (item.qty * item.price);
         }
-
         $("#totalPrice").text(totalPrice);
         // 메뉴 개수에 따른 장바구니 목록 출력
         for (item of items) {
@@ -85,7 +83,7 @@
                 `<div class="panel-group">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <input type="checkbox" id="${item.unique}" value="${item.unique}" name="menuCheckBox"/>
+                            <input type="checkbox" value="${item.unique}" name="menuCheckBox"/>
                             <span>
                                 ${item.item_name}
                             </span>
@@ -120,11 +118,9 @@
             $(`#${items[i].unique}plusBtn`).click(() => {
                 let count = $(`#${items[i].unique}input`).val(); // 수량
                 let price = items[i].price; // 음식 가격
-
                 count = parseInt(count) + 1;
                 price = parseInt(price) * count;
                 totalPrice = totalPrice + items[i].price;
-
                 items[i].qty = count;
                 $(`#${items[i].unique}input`).val(count); // 삽입
                 $(`#${items[i].unique}price`).text(price); // 삽입
@@ -134,27 +130,21 @@
             $(`#${items[i].unique}minusBtn`).click(() => {
                 let count = $(`#${items[i].unique}input`).val(); // 수량
                 let price = items[i].price; // 음식 가격
-
                 count = parseInt(count) - 1;
-
                 if (count < 0) {
                     count = 0;
                 } else {
                     totalPrice = totalPrice - items[i].price; // 수량이 0이면 총 가격에 변화 없음
                 }
                 price = parseInt(price) * count;
-
                 items[i].qty = count;
                 $(`#${items[i].unique}input`).val(count); // 삽입
                 $(`#${items[i].unique}price`).text(price); // 삽입
                 $(`#totalPrice`).text(totalPrice); // 삽입
-
             })
         }
-
         // 결제하기
         $("#payBtn").click(() => {
-            // 현재 카트에 주문되어있는 값들로 리스트 생성
             BootPay.request({
                 price: totalPrice, //실제 결제되는 가격
                 application_id: '5f34ea102fa5c20025eecac0',
@@ -218,34 +208,14 @@
         $("#removeBtn").click(() => {
             let checkedMenu = $("input:checked");
             if (checkedMenu) {
-
                 $('input:checked').each(function () {
-                    var unique = `${this.value}price`;
-                    var removedPrice = document.getElementById("" + unique + "").innerHTML;
-                    totalPrice -= removedPrice;
+                    let unique = `${this.value}price`;
+                    let removedPrice = document.getElementById("" + unique + "").innerHTML;
+                    totalPrice -= removedPrice
                 })
-                $('input:checked').parentsUntil('.panel-group').remove(); // 장바구니 삭제
-                $(`#totalPrice`).text(totalPrice); // 삽입
+                $('input:checked').parentsUntil('.panel-group').remove() // 장바구니 삭제
+                $(`#totalPrice`).text(totalPrice) // 삽입
             }
         });
     });
 </script>
-<!--
-    $("#removeBtn").click(() => {
-        let checkedMenu = $("input:checked");
-        if (checkedMenu) {
-            $('input:checked').each(() => {
-                let index = items.findIndex((value, index, array) => {
-                    return value.unique === $('input:checked').val();
-                }) 
-                console.log(index)
-                totalPrice = parseInt(totalPrice) - (items[index].qty * items[index].price)
-            console.log(items.pop(index));
-            //   let removedPrice = document.getElementById("" + unique + "").innerHTML;
-            //   totalPrice -= removedPrice
-        })
-        $('input:checked').parentsUntil('.panel-group').remove() // 장바구니 삭제
-        $(`#totalPrice`).text(totalPrice) // 삽입
-    }
-});
--->

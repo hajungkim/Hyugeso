@@ -168,9 +168,10 @@ app.post('/insertOrderList', async function(req, res) {
     // 주문정보 INSERT
     connection.query('INSERT INTO order_info_tb SET ? ', SQL1, function(error, result, fields) {
         if(error) {
-            throw error;
+            console.log('[ERR] 주문정보 ISNERT 실패');
+            throw (error);
         } else {
-            console.log(result);
+            console.log('[OK] 주문정보 INSERT');
 
             // 음식 리스트 INSERT
             for(i in jsonData) {
@@ -188,9 +189,10 @@ app.post('/insertOrderList', async function(req, res) {
         
                 connection.query('INSERT INTO order_food_info_tb SET ?', SQL2, function(error, result, fields) {
                     if(error) {
-                        throw error;
+                        console.log('[ERR] 음식정보 ISNERT 실패');
+                        throw (error);
                     } else {
-                        console.log(result);
+                        console.log('[OK] 음식정보 INSERT 성공');
                     }
                 });
             }

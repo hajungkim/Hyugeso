@@ -194,7 +194,7 @@ app.post('/insertOrderList', async function(req, res) {
                 console.log(jsonData[i]);
                 const name = jsonData[i].item_name;
                 const cnt = jsonData[i].qty;
-                const price = jsonData[i].price;
+                const price = jsonData[i].cost;
         
                 const SQL2 = {
                     order_no: order_no,

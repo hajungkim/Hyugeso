@@ -72,7 +72,7 @@ app.listen(3000, function () {
 
 // 사용자 앱에서 휴게서 위도,경도 요청시 값 보내주기 - 홈 화면(지도, 리스트)
 app.post("/requestRestAreaLatLong", function (req, res) {
-  connection.query("SELECT area_code, area_nm, latitude, longitude FROM restarea_info_tb", function (
+  connection.query("SELECT area_code, area_nm, road_nm, latitude, longitude FROM restarea_info_tb", function (
     error,
     result,
     fields

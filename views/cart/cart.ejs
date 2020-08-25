@@ -50,26 +50,7 @@
     // 장바구니에 담을 상품
     // menulist화면에서 session에 담아서, cart로 넘겨준다
     // cart에서 session에 접근해서 list를 만든다
-    let items = [
-        {
-            item_name: '김치찌개',
-            qty: 3,
-            unique: '123',
-            price: 4000
-        },
-        {
-            item_name: '치즈라면',
-            qty: 6,
-            unique: '345',
-            price: 4000
-        },
-        {
-            item_name: '해물라면',
-            qty: 6,
-            unique: '234',
-            price: 4000
-        }
-    ];
+    const items = JSON.parse(localStorage.getItem('cartItem'));
     let totalPrice = 0;
 
     $(() => {
@@ -85,9 +66,9 @@
                 `<div class="panel-group">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <input type="checkbox" id="${item.unique}" value="${item.unique}" name="menuCheckBox"/>
+                            <input type="checkbox" id="${item.name}" value="${item.name}" name="menuCheckBox"/>
                             <span>
-                                ${item.item_name}
+                                ${item.name}
                             </span>
                         </div>
                         <div class="panel-body">
@@ -97,16 +78,16 @@
                                         <p>수량</p>
                                     </div>
                                     <div class="col-xs-6">
-                                        <button type="button" class="btn btn-default btn-xs" id="${item.unique}minusBtn">
+                                        <button type="button" class="btn btn-default btn-xs" id="${item.name}minusBtn">
                                             <span class="glyphicon glyphicon-minus"></span>
                                         </button>
-                                        <input type="number" id="${item.unique}input" value="${item.qty}" min="0" style="width: 40px;">
-                                        <button type="button" class="btn btn-default btn-xs" id="${item.unique}plusBtn">
+                                        <input type="number" id="${item.name}input" value="${item.qty}" min="0" style="width: 40px;">
+                                        <button type="button" class="btn btn-default btn-xs" id="${item.name}plusBtn">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </button>
                                     </div>
                                     <div class="col-xs-3">
-                                        <span class="price" id="${item.unique}price">${item.price * item.qty}</span>원
+                                        <span class="price" id="${item.name}price">${item.price * item.qty}</span>원
                                     </div>
                                 </div>
                             </div>
@@ -117,8 +98,8 @@
         // 메뉴마다 + - 버튼 기능 추가하기
         for (let i = 0; i < items.length; i++) {
             //수량 + 버튼
-            $(`#${items[i].unique}plusBtn`).click(() => {
-                let count = $(`#${items[i].unique}input`).val(); // 수량
+            $(`#${items[i].name}plusBtn`).click(() => {
+                let count = $(`#${items[i].name}input`).val(); // 수량
                 let price = items[i].price; // 음식 가격
 
                 count = parseInt(count) + 1;
@@ -126,13 +107,13 @@
                 totalPrice = totalPrice + items[i].price;
 
                 items[i].qty = count;
-                $(`#${items[i].unique}input`).val(count); // 삽입
-                $(`#${items[i].unique}price`).text(price); // 삽입
+                $(`#${items[i].name}input`).val(count); // 삽입
+                $(`#${items[i].name}price`).text(price); // 삽입
                 $(`#totalPrice`).text(totalPrice); // 삽입
             })
             // 수량 - 버튼
-            $(`#${items[i].unique}minusBtn`).click(() => {
-                let count = $(`#${items[i].unique}input`).val(); // 수량
+            $(`#${items[i].name}minusBtn`).click(() => {
+                let count = $(`#${items[i].name}input`).val(); // 수량
                 let price = items[i].price; // 음식 가격
 
                 count = parseInt(count) - 1;
@@ -145,8 +126,8 @@
                 price = parseInt(price) * count;
 
                 items[i].qty = count;
-                $(`#${items[i].unique}input`).val(count); // 삽입
-                $(`#${items[i].unique}price`).text(price); // 삽입
+                $(`#${items[i].name}input`).val(count); // 삽입
+                $(`#${items[i].name}price`).text(price); // 삽입
                 $(`#totalPrice`).text(totalPrice); // 삽입
 
             })

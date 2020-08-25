@@ -136,7 +136,12 @@
       const data = btn.parentNode.parentNode.parentNode;
       const count = btn.parentNode;
 
-      item = [data.childNodes[0].innerText, data.childNodes[1].innerText, count.firstChild.childNodes[3].value];
+      item = {
+        name: data.childNodes[0].innerText,
+        price: data.childNodes[1].innerText.substr(0, (data.childNodes[1].innerText).length-1),
+        qty:count.firstChild.childNodes[3].value,
+      };
+      console.log(item);
       array.push(item);
       localStorage.setItem("cartItem", JSON.stringify(array));
     };

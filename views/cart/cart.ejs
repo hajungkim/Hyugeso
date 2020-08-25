@@ -57,7 +57,7 @@
     let totalPrice = 0;
     // 총 가격 계산
     for (let item of cartItems) {
-        totalPrice = totalPrice + item.qty * item.price;
+        totalPrice = totalPrice + (item.qty * item.price);
     }
     $(() => {
 
@@ -75,25 +75,32 @@
                     </div>
                     <div class="panel-body">
                         <div class="container" style="align-items: center;">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <p>수량</p>
-                                </div>
-                                <div class="col-xs-6">
-                                    <button type="button" class="btn btn-default btn-xs" id="${item.unique}minusBtn">
+                            <table style='width: 100%;'>
+                                <thead>
+                                    <th style='width:33%;'>단가</th>
+                                    <th style='width:33%;'>수량</th>
+                                    <th style='width:33%;'>가격</th>
+                                </thead>
+                                <tbody>
+                                    <td>
+                                        <span id="${item.unique}price">${item.price}</span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-default btn-xs" id="${item.unique}minusBtn">
                                         <span class="glyphicon glyphicon-minus"></span>
-                                    </button>
-                                    &nbsp;
-                                    <span id="${item.unique}count">${item.qty}</span>
-                                    &nbsp;
-                                    <button type="button" class="btn btn-default btn-xs" id="${item.unique}plusBtn">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </button>
-                                </div>
-                                <div class="col-xs-3">
-                                    <span class="price" id="${item.unique}price">${item.price * item.qty}</span>원
-                                </div>
-                            </div>
+                                        </button>
+                                        &nbsp;
+                                        <span id="${item.unique}count">${item.qty}</span>
+                                        &nbsp;
+                                        <button type="button" class="btn btn-default btn-xs" id="${item.unique}plusBtn">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <span class="price" id="${item.unique}total">${item.price * item.qty}</span>원
+                                    </td>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -113,7 +120,7 @@
 
                 cartItems[i].qty = count;
                 $(`#${cartItems[i].unique}count`).text(count); // 삽입
-                $(`#${cartItems[i].unique}price`).text(price); // 삽입
+                $(`#${cartItems[i].unique}total`).text(price); // 삽입
                 $(`#totalPrice`).text(totalPrice); // 삽입
             });
             // 수량 - 버튼
@@ -132,7 +139,7 @@
 
                 cartItems[i].qty = count;
                 $(`#${cartItems[i].unique}count`).text(count); // 삽입
-                $(`#${cartItems[i].unique}price`).text(price); // 삽입
+                $(`#${cartItems[i].unique}total`).text(price); // 삽입
                 $(`#totalPrice`).text(totalPrice); // 삽입
             });
         }
@@ -151,10 +158,11 @@
 
                 orderItem.unique = document.getElementsByName("menuCheckBox")[i].value;
                 orderItem.qty = document.getElementById(orderItem.unique + "count").innerText;
-                orderItem.price = document.getElementById(orderItem.unique + "price").innerText;
+                orderItem.price = parseInt(document.getElementById(orderItem.unique + "price").innerText);
+                orderItem.total = parseInt(document.getElementById(orderItem.unique + "total").innerText);
                 orderItem.item_name = document.getElementById(orderItem.unique + "name").innerText;
                 orderList.push(orderItem);
-                totalPrice = totalPrice + parseInt(orderItem.price);
+                totalPrice = totalPrice + parseInt(orderItem.total);
                 document.getElementById("totalPrice").innerText = totalPrice;
             }
 
@@ -213,7 +221,7 @@
                             area_nm: area_nm, // 휴게소 이름
                             total_cost: totalPrice, // 총 가격 
                             phone_no: formatted_phone_no, // 주문자 번호 - 입력받은 핸드폰 번호 넣어주어야함
-                            lists: JSON.stringify(cartItems), // 주문 내역
+                            lists: JSON.stringify(orderList), // 주문 내역
                         },
                         success: function (data) {
                             // 결제완료시 주문번호 리턴

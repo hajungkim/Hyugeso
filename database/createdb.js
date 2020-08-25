@@ -131,7 +131,8 @@ function createOrderFoodInfo (connection) {
             order_no varchar(15) not null,
             food_nm varchar(30) not null,
             food_price int(5) not null,
-            food_cnt int(5) not null
+            food_cnt int(5) not null,
+            total_price int(6) not null
         )`,
         function(error, result, fields) {
             if(error) {

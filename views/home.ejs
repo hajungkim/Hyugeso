@@ -21,11 +21,12 @@
     type="text/javascript"
    src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xx81d8228c35324ed3be2ba79ed4c15a67"></script>
     <div id='restareaList' style="width: 40%; height: 400px; overflow: scroll; overflow-x: hidden">
-      <form action="/restAreaInfo">
-        <ul id='listItems'>
-        </ul>
-      </form>
-
+        <form action="/restAreaInfo">
+            <div class='row'>
+                <ul id='listItems'>
+                </ul>
+            </div>
+        </form>
     </div>
 </body>
 
@@ -122,7 +123,7 @@
 
     // 휴게소 목록 리스트 그리기
     function drawList(results, currentPos) {
-         var iValue = rName.indexOf("고속도로");
+        var iValue = rName.indexOf("고속도로");
         if(iValue != -1)
         {
             rName = rName.substring(0,iValue);
@@ -139,10 +140,11 @@
         submit.type = 'submit';
         submit.value = '휴게소 정보';
         var result_distance = new Array(results.Size);
+
         for(i in results) {
             var restArea_roadName = results[i].road_nm;
-            restArea_roadName = restArea_roadName.substring(0,restArea_roadName.length-1);
-            if(restArea_roadName == rName){
+            var new_roadName = restArea_roadName.substring(0, restArea_roadName.length-1);
+            if(new_roadName == rName){
                 var distance = {
                     lat : results[i].latitude,
                     lon : results[i].longitude,

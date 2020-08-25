@@ -41,15 +41,17 @@
           <div class="table-responsive">
             <table class="table table-hover">
               <thead>
-                 <th>주문내역</th>
-               </thead>
+                  <th>주문내역</th>
+                  <th>단가</th>
+                  <th>수량</th>
+                  <th>금액</th>
+                </thead>
                <tbody id="orderList">
               </tbody>
             </table>
           </div>
           <hr />
           <div class="row" id="info">
-            
           </div>
         </div>
         <div class="modal-footer">
@@ -91,15 +93,17 @@
         let html2 = '';
         for(i in data) {
             const food_nm = data[i].food_nm;
-            const food_cnt = data[i].food_cnt;
             const food_price = data[i].food_price;
+            const food_cnt = data[i].food_cnt;
+            const total_price = data[i].total_price;
 
             const items= `
               <tbody>
                 <tr>
                   <td>${food_nm}</td>
-                  <td>${food_cnt}</td>
                   <td>${food_price}</td>
+                  <td>${food_cnt}</td>
+                  <td>${total_price}</td>
                 </tr>
               </tbody>
                 `;
@@ -112,7 +116,7 @@
         var cost = 0;
 
         for (i in data) {
-          cost += data[i].food_price;
+          cost += data[i].total_price;
         }
         const item= `
         <div class="col-xs-8">

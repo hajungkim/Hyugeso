@@ -8,7 +8,7 @@ var expressLayouts = require("express-ejs-layouts");
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "doseee114",
+  password: "12qw!@QW",
   database: "test",
 });
 
@@ -65,43 +65,36 @@ app.get("/orderDetail", function (req, res) {
   res.render("orderlist/orderDetail");
 });
 
-
 // 서버 Start
 app.listen(3000, function () {
   console.log("example app listening at http://localhost:3000");
 });
 
-
-
-
 // 사용자 앱에서 휴게서 위도,경도 요청시 값 보내주기 - 홈 화면(지도, 리스트)
 app.post("/requestRestAreaLatLong", function (req, res) {
-  connection.query(
-    "SELECT area_code, area_nm, latitude, longitude FROM restarea_info_tb",
-    function (error, result, fields) {
-      if (error) {
-        throw error;
-      } else {
-        res.send(JSON.stringify(result));
-      }
+  connection.query("SELECT area_code, area_nm, latitude, longitude FROM restarea_info_tb", function (
+    error,
+    result,
+    fields
+  ) {
+    if (error) {
+      throw error;
+    } else {
+      res.send(JSON.stringify(result));
     }
-  );
+  });
 });
 
 // 사용자 앱에서 휴게소 하나 선택시, 휴게소 정보 값 보내주기 - 휴게소 정보 화면(휴게소 정보)
 app.post("/requestRestAreaInfo", function (req, res) {
   const areaCode = req.body.area_code;
-  connection.query(
-    "SELECT * FROM restarea_info_tb WHERE area_code = ?",
-    [areaCode],
-    function (error, result, fields) {
-      if (error) {
-        throw error;
-      } else {
-        res.send(JSON.stringify(result));
-      }
+  connection.query("SELECT * FROM restarea_info_tb WHERE area_code = ?", [areaCode], function (error, result, fields) {
+    if (error) {
+      throw error;
+    } else {
+      res.send(JSON.stringify(result));
     }
-  );
+  });
 });
 
 // 사용자 앱에서 메뉴주문 선택시, 메뉴 내용 값 보내주기 - 메뉴 화면(휴게소 메뉴 정보)
@@ -112,12 +105,10 @@ app.post("/requestMenuInfo", async function (req, res) {
   res.send(results);
 });
 
-
 // 사용자 번호 입력받아서 주문내역 반환
 app.post("/requestOrderList", function (req, res) {
   const phone_no = req.body.phone_no;
   const gigan = req.body.gigan;
-
   // 오늘 날짜 yyyymmdd 형태로 만들기
   const date = new Date();
   const year = date.getFullYear().toString();
@@ -134,14 +125,14 @@ app.post("/requestOrderList", function (req, res) {
   }
   console.log(searchGigan);
 
-  var formatted = phone_no.slice(0, 3) + '-' + phone_no.slice(3, 7) + '-' + phone_no.slice(7);
+  var formatted = phone_no.slice(0, 3) + "-" + phone_no.slice(3, 7) + "-" + phone_no.slice(7);
   console.log(formatted);
 
-  connection.query("SELECT * FROM order_info_tb WHERE order_no LIKE ? AND orderer_pn = ? ORDER BY 1 DESC", [searchGigan, formatted], function (error, result, fields) {    
-      if(error) { 
+  connection.query("SELECT * FROM order_info_tb WHERE order_no LIKE ? AND orderer_pn = ? ORDER BY 1 DESC", [searchGigan, formatted], function (error, result, fields) {
+    if (error) {
       throw error;
     } else {
-      res.send(result);      
+      res.send(result);
     }
   });
 })
@@ -164,17 +155,10 @@ getMenuInfo = async (areaName) => {
   const API_KEY = "7027848923";
 
   var url = "http://data.ex.co.kr/openapi/restinfo/restBestfoodList";
-  var queryParams =
-    "?" + encodeURIComponent("key") + `=${API_KEY}`; /* Service Key*/
-  queryParams +=
-    "&" + encodeURIComponent("type") + "=" + encodeURIComponent("json");
-  queryParams +=
-    "&" +
-    encodeURIComponent("stdRestNm") +
-    "=" +
-    encodeURIComponent(`${areaName}`);
-  queryParams +=
-    "&" + encodeURIComponent("numOfRows") + "=" + encodeURIComponent("100");
+  var queryParams = "?" + encodeURIComponent("key") + `=${API_KEY}`; /* Service Key*/
+  queryParams += "&" + encodeURIComponent("type") + "=" + encodeURIComponent("json");
+  queryParams += "&" + encodeURIComponent("stdRestNm") + "=" + encodeURIComponent(`${areaName}`);
+  queryParams += "&" + encodeURIComponent("numOfRows") + "=" + encodeURIComponent("100");
 
   const res = await axios.get(url + queryParams);
   // console.log(res.data.list);
@@ -182,98 +166,112 @@ getMenuInfo = async (areaName) => {
 };
 
 // 결제완료시 음식 주문내역 DB에 삽입
-app.post('/insertOrderList', async function(req, res) {
-    console.log(req.body);
-    const phoneNo = req.body.phone_no;
-    const totalCost = req.body.total_cost;
-    const areaNm = req.body.area_nm;
-    const lists = req.body.lists;
-    const jsonData = JSON.parse(lists);
+app.post("/insertOrderList", async function (req, res) {
+  console.log(req.body);
+  const phoneNo = req.body.phone_no;
+  const totalCost = req.body.total_cost;
+  const areaNm = req.body.area_nm;
+  const lists = req.body.lists;
+  const jsonData = JSON.parse(lists);
 
-    console.log('orderNo start');
-    const order_no = await getOrderNo();
-    console.log('orderNo end');
+  console.log("orderNo start");
+  const order_no = await getOrderNo();
+  console.log("orderNo end");
 
-    console.log(phoneNo);
+  console.log(phoneNo);
 
-    const SQL1 = {
-        order_no : order_no,
-        area_nm : areaNm,
-        total_cost : totalCost,
-        orderer_pn : phoneNo,
+  const SQL1 = {
+    order_no: order_no,
+    area_nm: areaNm,
+    total_cost: totalCost,
+    orderer_pn: phoneNo,
+  };
+  // 주문정보 INSERT
+  connection.query("INSERT INTO order_info_tb SET ? ", SQL1, function (error, result, fields) {
+    if (error) {
+      console.log("[ERR] 주문정보 ISNERT 실패");
+      throw error;
+    } else {
+      console.log("[OK] 주문정보 INSERT");
+
+      // 음식 리스트 INSERT
+      for (i in jsonData) {
+        console.log(jsonData[i]);
+        const name = jsonData[i].item_name;
+        const cnt = jsonData[i].qty;
+        const price = jsonData[i].price;
+
+        const SQL2 = {
+          order_no: order_no,
+          food_nm: name,
+          food_cnt: cnt,
+          food_price: price,
+          total_price: price * cnt,
+        };
+
+        connection.query("INSERT INTO order_food_info_tb SET ?", SQL2, function (error, result, fields) {
+          if (error) {
+            console.log("[ERR] 음식정보 ISNERT 실패");
+            throw error;
+          } else {
+            console.log("[OK] 음식정보 INSERT 성공");
+          }
+        });
+      }
     }
-    // 주문정보 INSERT
-    connection.query('INSERT INTO order_info_tb SET ? ', SQL1, function(error, result, fields) {
-        if(error) {
-            console.log('[ERR] 주문정보 ISNERT 실패');
-            throw (error);
-        } else {
-            console.log('[OK] 주문정보 INSERT');
-
-            // 음식 리스트 INSERT
-            for(i in jsonData) {
-                console.log(jsonData[i]);
-                const name = jsonData[i].item_name;
-                const cnt = jsonData[i].qty;
-                const price = jsonData[i].cost;
-        
-                const SQL2 = {
-                    order_no: order_no,
-                    food_nm: name,
-                    food_cnt: cnt,
-                    food_price: price,
-                };
-        
-                connection.query('INSERT INTO order_food_info_tb SET ?', SQL2, function(error, result, fields) {
-                    if(error) {
-                        console.log('[ERR] 음식정보 ISNERT 실패');
-                        throw (error);
-                    } else {
-                        console.log('[OK] 음식정보 INSERT 성공');
-                    }
-                });
-            }
-        }
-        // 주문정보, 음식주문정보 테이블에 다 넣으면 주문번호 반환
-        res.send(order_no);
-    });
-})
+    // 주문정보, 음식주문정보 테이블에 다 넣으면 주문번호 반환
+    res.send(order_no);
+  });
+});
 
 // 주문번호 만들기
 async function getOrderNo() {
-    // 오늘 날짜 yyyymmdd 형태로 만들기
-    const date = new Date();
-    const year = date.getFullYear().toString();
-    const month = (date.getMonth() + 1);
-    const day = date.getDate();
-    const todayDate = year + (month < 10 ? ('0' + month) : month).toString() + (day < 10 ? ('0' + day) : day).toString();
-    console.log('today:', todayDate);
-    
-    // 오늘 날짜 기준으로 주문 건수 계산해서 다음 번호 붙이기
-    const cnt = await getOrderCnt(todayDate);
-    console.log('count :', cnt);
+  // 오늘 날짜 yyyymmdd 형태로 만들기
+  const date = new Date();
+  const year = date.getFullYear().toString();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const todayDate = year + (month < 10 ? "0" + month : month).toString() + (day < 10 ? "0" + day : day).toString();
+  console.log("today:", todayDate);
 
-    // 주문번호 만들기
-    const orderNo = 'OD' + todayDate + cnt;
-    console.log('in order No:', orderNo);
+  // 오늘 날짜 기준으로 주문 건수 계산해서 다음 번호 붙이기
+  const cnt = await getOrderCnt(todayDate);
+  console.log("count :", cnt);
 
-    return orderNo;
+  // 주문번호 만들기
+  const orderNo = "OD" + todayDate + cnt;
+  console.log("in order No:", orderNo);
+
+  return orderNo;
 }
 
 // DB에서 오늘 날짜 기준으로 들어온 주문 건수 가져오기 (동기 처리 해야함)
 function getOrderCnt(todayDate) {
-    return new Promise( (resolve, reject) => {
-        let cnt = 0;
-        connection.query('SELECT * FROM order_info_tb WHERE substr(order_no, 3, 8) = ?', [todayDate], function(error, result, fields) {
-            if(error) {
-                reject(error);
-            } else {
-                console.log('result length:', result.length);
-                let temp = result.length + 1;
-                cnt = (temp < 10 ? '0000' + temp : (temp < 100 ? '000' + temp : (temp < 1000 ? '00' + temp : (temp < 10000 ? '0' + temp : temp))));
-                console.log('getOrderCnt:',cnt);
-                resolve(cnt);
-            }
-        });
-    })
+  return new Promise((resolve, reject) => {
+    let cnt = 0;
+    connection.query("SELECT * FROM order_info_tb WHERE substr(order_no, 3, 8) = ?", [todayDate], function (
+      error,
+      result,
+      fields
+    ) {
+      if (error) {
+        reject(error);
+      } else {
+        console.log("result length:", result.length);
+        let temp = result.length + 1;
+        cnt =
+          temp < 10
+            ? "0000" + temp
+            : temp < 100
+            ? "000" + temp
+            : temp < 1000
+            ? "00" + temp
+            : temp < 10000
+            ? "0" + temp
+            : temp;
+        console.log("getOrderCnt:", cnt);
+        resolve(cnt);
+      }
+    });
+  });
 }

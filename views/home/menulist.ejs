@@ -60,7 +60,6 @@
 
   <!-- 메뉴 리스트 읽어오기 -->
   <script>
-
     const qs = getQueryStringObject();
     const areaName = qs.area_nm;
 
@@ -100,7 +99,8 @@
                   <input type=text value=1>
                   <input type=button value="+" onclick='plusBtn(this)'>
               </div> `;
-        html += "<button onclick='cartBtn(this)' href='#popup' data-toggle='modal' class='btn btn-primary'>장바구니</button>";
+        html +=
+          "<button onclick='cartBtn(this)' href='#popup' data-toggle='modal' class='btn btn-primary'>장바구니</button>";
         html += `<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -132,14 +132,16 @@
 
     //장바구니 버튼 누르면 로컬스토리지에 저장하는 함수
     var array = [];
+
     function cartBtn(btn) {
       const data = btn.parentNode.parentNode.parentNode;
       const count = btn.parentNode;
 
       item = {
-        name: data.childNodes[0].innerText,
-        price: data.childNodes[1].innerText.substr(0, (data.childNodes[1].innerText).length-1),
-        qty:count.firstChild.childNodes[3].value,
+        item_name: data.childNodes[0].innerText,
+        price: parseInt(data.childNodes[1].innerText.substr(0, (data.childNodes[1].innerText).length - 1)),
+        qty: parseInt(count.firstChild.childNodes[3].value),
+        unique: array.length.toString(),
       };
       console.log(item);
       array.push(item);
@@ -177,7 +179,6 @@
       }
       return b;
     }
-
   </script>
 </body>
 

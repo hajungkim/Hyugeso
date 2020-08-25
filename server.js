@@ -8,7 +8,7 @@ var expressLayouts = require("express-ejs-layouts");
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "12qw!@QW",
+  password: "doseee114",
   database: "test",
 });
 
@@ -116,17 +116,47 @@ app.post("/requestMenuInfo", async function (req, res) {
 // 사용자 번호 입력받아서 주문내역 반환
 app.post("/requestOrderList", function (req, res) {
   const phone_no = req.body.phone_no;
+  const gigan = req.body.gigan;
+
+  // 오늘 날짜 yyyymmdd 형태로 만들기
+  const date = new Date();
+  const year = date.getFullYear().toString();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const todayDate = year + (month < 10 ? "0" + month : month).toString() + (day < 10 ? "0" + day : day).toString();
+  console.log("today:", todayDate);
+
+  let searchGigan;
+  if(gigan == '오늘') {
+    searchGigan = '%' + todayDate + '%';
+  } else {
+    searchGigan = '%';
+  }
+  console.log(searchGigan);
+
   var formatted = phone_no.slice(0, 3) + '-' + phone_no.slice(3, 7) + '-' + phone_no.slice(7);
   console.log(formatted);
 
-  connection.query('SELECT * FROM order_info_tb WHERE orderer_pn = ?', [formatted], function(error, result, fields) {
-    if(error) { 
+  connection.query("SELECT * FROM order_info_tb WHERE order_no LIKE ? AND orderer_pn = ? ORDER BY 1 DESC", [searchGigan, formatted], function (error, result, fields) {    
+      if(error) { 
       throw error;
     } else {
       res.send(result);      
     }
   });
 })
+
+app.post("/requestOrderInfo", function (req, res) {
+    const order_no = req.body.order_no;
+  
+    connection.query('SELECT * FROM order_food_info_tb WHERE order_no = ?', [order_no], function(error, result, fields) {
+      if(error) { 
+        throw error;
+      } else {
+        res.send(result);      
+      }
+    });
+  })
 
 
 // 메뉴API(공공데이터) 사용해서 메뉴 가져오기

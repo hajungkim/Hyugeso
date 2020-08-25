@@ -50,102 +50,127 @@
     // 장바구니에 담을 상품
     // menulist화면에서 session에 담아서, cart로 넘겨준다
     // cart에서 session에 접근해서 list를 만든다
-    const items = JSON.parse(localStorage.getItem('cartItem'));
+    let cartItems = JSON.parse(localStorage.getItem('cartItem'));
     let totalPrice = 0;
-
+    // 총 가격 계산
+    for (let item of cartItems) {
+        totalPrice = totalPrice + item.qty * item.price;
+    }
     $(() => {
-        // 총 가격 계산
-        for (const item of items) {
-            totalPrice = totalPrice + (item.qty * item.price);
-        }
 
         $("#totalPrice").text(totalPrice);
         // 메뉴 개수에 따른 장바구니 목록 출력
-        for (item of items) {
+        for (item of cartItems) {
             $(".well").prepend(
-                `<div class="panel-group">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <input type="checkbox" id="${item.name}" value="${item.name}" name="menuCheckBox"/>
-                            <span>
-                                ${item.name}
-                            </span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="container" style="align-items: center;">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <p>수량</p>
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <button type="button" class="btn btn-default btn-xs" id="${item.name}minusBtn">
-                                            <span class="glyphicon glyphicon-minus"></span>
-                                        </button>
-                                        <input type="number" id="${item.name}input" value="${item.qty}" min="0" style="width: 40px;">
-                                        <button type="button" class="btn btn-default btn-xs" id="${item.name}plusBtn">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </button>
-                                    </div>
-                                    <div class="col-xs-3">
-                                        <span class="price" id="${item.name}price">${item.price * item.qty}</span>원
-                                    </div>
+                `<div class="panel-group" id="${item.unique}panel">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <input type="checkbox" id="${item.unique}checkBox" value="${item.unique}" name="menuCheckBox"/>
+                        <span id="${item.unique}name">
+                            ${item.item_name}
+                        </span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="container" style="align-items: center;">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <p>수량</p>
+                                </div>
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-default btn-xs" id="${item.unique}minusBtn">
+                                        <span class="glyphicon glyphicon-minus"></span>
+                                    </button>
+                                    &nbsp;
+                                    <span id="${item.unique}count">${item.qty}</span>
+                                    &nbsp;
+                                    <button type="button" class="btn btn-default btn-xs" id="${item.unique}plusBtn">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </button>
+                                </div>
+                                <div class="col-xs-3">
+                                    <span class="price" id="${item.unique}price">${item.price * item.qty}</span>원
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>`)
+                </div>
+            </div>`
+            );
         }
         // 메뉴마다 + - 버튼 기능 추가하기
-        for (let i = 0; i < items.length; i++) {
+        for (let i = 0; i < cartItems.length; i++) {
             //수량 + 버튼
-            $(`#${items[i].name}plusBtn`).click(() => {
-                let count = $(`#${items[i].name}input`).val(); // 수량
-                let price = items[i].price; // 음식 가격
+            $(`#${cartItems[i].unique}plusBtn`).click(() => {
+                let count = $(`#${cartItems[i].unique}count`).text(); // 수량
+                let price = cartItems[i].price; // 음식 가격
 
                 count = parseInt(count) + 1;
                 price = parseInt(price) * count;
-                totalPrice = totalPrice + items[i].price;
+                totalPrice = totalPrice + cartItems[i].price;
 
-                items[i].qty = count;
-                $(`#${items[i].name}input`).val(count); // 삽입
-                $(`#${items[i].name}price`).text(price); // 삽입
+                cartItems[i].qty = count;
+                $(`#${cartItems[i].unique}count`).text(count); // 삽입
+                $(`#${cartItems[i].unique}price`).text(price); // 삽입
                 $(`#totalPrice`).text(totalPrice); // 삽입
-            })
+            });
             // 수량 - 버튼
-            $(`#${items[i].name}minusBtn`).click(() => {
-                let count = $(`#${items[i].name}input`).val(); // 수량
-                let price = items[i].price; // 음식 가격
+            $(`#${cartItems[i].unique}minusBtn`).click(() => {
+                let count = $(`#${cartItems[i].unique}count`).text(); // 수량
+                let price = cartItems[i].price; // 음식 가격
 
                 count = parseInt(count) - 1;
 
                 if (count < 0) {
                     count = 0;
                 } else {
-                    totalPrice = totalPrice - items[i].price; // 수량이 0이면 총 가격에 변화 없음
+                    totalPrice = totalPrice - cartItems[i].price; // 수량이 0이면 총 가격에 변화 없음
                 }
                 price = parseInt(price) * count;
 
-                items[i].qty = count;
-                $(`#${items[i].name}input`).val(count); // 삽입
-                $(`#${items[i].name}price`).text(price); // 삽입
+                cartItems[i].qty = count;
+                $(`#${cartItems[i].unique}count`).text(count); // 삽입
+                $(`#${cartItems[i].unique}price`).text(price); // 삽입
                 $(`#totalPrice`).text(totalPrice); // 삽입
-
-            })
+            });
         }
 
         // 결제하기
         $("#payBtn").click(() => {
+
+            var phone_no = prompt('핸드폰번호 입력');
+            var formatted_phone_no = phone_no.slice(0, 3) + "-" + phone_no.slice(3, 7) + "-" + phone_no.slice(7);
+
+            let totalPrice = 0;
+            let orderList = [];
+            let orderListCnt = document.getElementsByName("menuCheckBox").length;
+            for (let i = 0; i < orderListCnt; i++) {
+                let orderItem = {};
+
+                orderItem.unique = document.getElementsByName("menuCheckBox")[i].value;
+                orderItem.qty = document.getElementById(orderItem.unique + "count").innerText;
+                orderItem.price = document.getElementById(orderItem.unique + "price").innerText;
+                orderItem.item_name = document.getElementById(orderItem.unique + "name").innerText;
+                orderList.push(orderItem);
+                totalPrice = totalPrice + parseInt(orderItem.price);
+                document.getElementById("totalPrice").innerText = totalPrice;
+            }
+
+            console.log(orderList);
+
             // 현재 카트에 주문되어있는 값들로 리스트 생성
             BootPay.request({
-                price: totalPrice, //실제 결제되는 가격
-                application_id: '5f34ea102fa5c20025eecac0',
-                name: '건천(부산) 휴게소', //결제창에서 보여질 이름
-                pg: '',
-                method: '', //결제수단, 입력하지 않으면 결제수단 선택부터 화면이 시작합니다.
-                show_agree_window: 0, // 부트페이 정보 동의 창 보이기 여부
-                items,
-                order_id: '고유order_id_1234', //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
-            })
+                    price: totalPrice, //실제 결제되는 가격
+                    application_id: '5f34ea102fa5c20025eecac0',
+                    name: '건천(부산) 휴게소', //결제창에서 보여질 이름
+                    pg: '',
+                    method: '', //결제수단, 입력하지 않으면 결제수단 선택부터 화면이 시작합니다.
+                    show_agree_window: 0, // 부트페이 정보 동의 창 보이기 여부
+                    items: orderList,
+                    user_info: {
+                        phone: formatted_phone_no // 사용자 핸드폰 번호 입력 받아야함 
+                    },
+                    order_id: '고유order_id_1234', //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
+                })
                 .error(function (data) {
                     //결제 진행시 에러가 발생하면 수행됩니다.
                     console.log(data)
@@ -176,24 +201,25 @@
                 .done(function (data) {
                     //결제가 정상적으로 완료되면 수행됩니다
                     //비즈니스 로직을 수행하기 전에 결제 유효성 검증을 하시길 추천합니다.
-                    
+
                     // 결제 완료된 데이터 서버로 넘기기
                     ajax({
                         url: '/insertOrderList',
                         type: 'POST',
                         data: {
-                            area_nm: 'XX휴게소',            // 휴게소 이름
-                            total_cost: totalPrice,         // 총 가격
-                            phone_no: '010-3101-8031',      // 주문자 번호
-                            lists: JSON.stringify(items),   // 주문 내역
+                            area_nm: 'XX휴게소', // 휴게소 이름
+                            total_cost: totalPrice, // 총 가격 
+                            phone_no: formatted_phone_no, // 주문자 번호 - 입력받은 핸드폰 번호 넣어주어야함
+                            lists: JSON.stringify(cartItems), // 주문 내역
                         },
-                        success: function(data) {
+                        success: function (data) {
                             // 결제완료시 주문번호 리턴
                             console.log(data);
                         }
                     });
                 })
         });
+
 
         // 장바구니 삭제
         $("#removeBtn").click(() => {

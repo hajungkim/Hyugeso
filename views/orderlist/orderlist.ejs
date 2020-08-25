@@ -26,7 +26,7 @@
                     <div class="navbar-form navbar-right">
                         <div class="form-inline">
                             <div class="form-group">
-                                <select class="form-control">
+                                <select id='gigan' class="form-control">
                                     <option class="nowDate">오늘</option>
                                     <option class="wholeDate">전체</option>
                                 </select>
@@ -65,12 +65,15 @@
     // 핸드폰번호 입력후 검색 버튼 클릭시 이벤트
     $('#btnSearch').click( function() {
         const phoneNum = document.getElementById('phoneNum').value;
+        const gigan = $('#gigan option:selected').val();
+        console.log(gigan);
         console.log(phoneNum);
         
         ajax({
             url: 'requestOrderList',
             type: 'POST',
             data: {
+                gigan : gigan,
                 phone_no : phoneNum,
             },
             success: function(data) {
@@ -89,11 +92,14 @@
             const order_no = data[i].order_no;
             const total_cost = data[i].total_cost;
 
+            let order_date = order_no.substr(2,8);
+            var formatted = order_date.slice(0, 4) + "-" + order_date.slice(4, 6) + "-" + order_date.slice(6);
+
             console.log(i);
             const items= `
                 <div class="col-sm-3">
                     <div class="panel panel-info">
-                        <div class="panel-heading">2020-08-22</div>
+                        <div class="panel-heading">${formatted}</div>
                             <div class="panel-body">
                                 <h4>${area_nm}</h4>
                                 <h4>${order_no}</h4>
@@ -112,11 +118,8 @@
         div.innerHTML = html;
     }
 
+    // 상세주문 팝업 
     function openWin() {
         window.open("./orderDetail","_blank","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
     }
-
-    $('.btn.btn-info').click( function() {
-        console.log('1');
-    });
 </script>

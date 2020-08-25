@@ -60,20 +60,11 @@ app.get("/orderlist", function (request, response) {
   response.render("orderlist/orderlist");
 });
 
-// 휴게소 정보 넘겨주기
-app.get("/restAreaInfo", function (req, res) {
-  res.render("restAreaInfo");
+// 결제 상세
+app.get("/orderDetail", function (req, res) {
+  res.render("orderlist/orderDetail");
 });
 
-// 메뉴 주문 화면
-app.get("/menu", function (req, res) {
-  res.render("menu");
-});
-
-// 결제 화면
-app.get("/orderList", function (req, res) {
-  res.render("orderList");
-});
 
 // 서버 Start
 app.listen(3000, function () {

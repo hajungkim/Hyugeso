@@ -41,44 +41,15 @@
           <div class="table-responsive">
             <table class="table table-hover">
               <thead>
-                <th>주문내역</th>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>김치라면</td>
-                  <td>1개</td>
-                  <td>4000원</td>
-                </tr>
-                <tr>
-                  <td>치즈라면</td>
-                  <td>1개</td>
-                  <td>4000원</td>
-                </tr>
-                <tr>
-                  <td>해물라면</td>
-                  <td>1개</td>
-                  <td>4000원</td>
-                </tr>
+                 <th>주문내역</th>
+               </thead>
+               <tbody id="orderList">
               </tbody>
             </table>
           </div>
           <hr />
-          <div class="row">
-            <div class="col-xs-8">
-              <h5><strong>주문 일시</strong></h5>
-              <h5><strong>결제 금액</strong></h5>
-            </div>
-            <div class="col-xs-4">
-              <h5>
-                <small><span>2020-08-22</span></small>
-              </h5>
-              <h5>
-                <small>
-                  <span>12000</span>
-                  원
-                </small>
-              </h5>
-            </div>
+          <div class="row" id="info">
+            
           </div>
         </div>
         <div class="modal-footer">
@@ -95,6 +66,95 @@
     </div>
   </body>
 </html>
+
+<script>
+  const qs = getQueryStringObject();
+  let order_no = qs.order_no;
+  
+  console.log(qs.order_no);
+
+  $.ajax({
+        url: '/requestOrderInfo',
+        type: 'POST',
+        data: {
+            order_no: order_no, 
+        },
+        success: function (data) {
+            drawOrderInfo(data);
+        }
+    });
+
+    function drawOrderInfo(data) {
+        const table = document.getElementById('orderList');
+        const div = document.getElementById('info');
+        let html = '';
+        let html2 = '';
+        for(i in data) {
+            const food_nm = data[i].food_nm;
+            const food_cnt = data[i].food_cnt;
+            const food_price = data[i].food_price;
+
+            const items= `
+              <tbody>
+                <tr>
+                  <td>${food_nm}</td>
+                  <td>${food_cnt}</td>
+                  <td>${food_price}</td>
+                </tr>
+              </tbody>
+                `;
+
+            html += items;
+        }
+        
+        let order_date = order_no.substr(2,8);
+        var formatted = order_date.slice(0, 4) + "-" + order_date.slice(4, 6) + "-" + order_date.slice(6);
+        var cost = 0;
+
+        for (i in data) {
+          cost += data[i].food_price;
+        }
+        const item= `
+        <div class="col-xs-8">
+              <h5><strong>주문 일시</strong></h5>
+              <h5><strong>결제 금액</strong></h5>
+            </div>
+            <div class="col-xs-4">
+              <h5>
+                <small><span>${formatted}</span></small>
+              </h5>
+              <h5>
+                <small>
+                  <span>${cost}</span>
+                  원
+                </small>
+              </h5>
+            </div>`;
+
+        html2 += item;
+        table.innerHTML = html;
+        div.innerHTML = html2;
+    }
+
+    function getQueryStringObject() {
+        var a = window.location.search.substr(1).split('&');
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i) {
+            var p = a[i].split('=', 2);
+            if (p.length == 1) {
+                b[p[0]] = "";
+            } else {
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+        }
+        return b;
+    }
+
+</script>
+
+
+
 <script>
   $('.close').click(() => {
     self.close()

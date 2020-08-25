@@ -46,6 +46,9 @@
 </html>
 
 <script>
+    const qs = getQueryStringObject();
+    let area_nm = qs.area_nm;
+
     const ajax = $.ajax;
     // 장바구니에 담을 상품
     // menulist화면에서 session에 담아서, cart로 넘겨준다
@@ -139,7 +142,7 @@
             BootPay.request({
                 price: totalPrice, //실제 결제되는 가격
                 application_id: '5f34ea102fa5c20025eecac0',
-                name: '건천(부산) 휴게소', //결제창에서 보여질 이름
+                name: area_nm, //결제창에서 보여질 이름
                 pg: '',
                 method: '', //결제수단, 입력하지 않으면 결제수단 선택부터 화면이 시작합니다.
                 show_agree_window: 0, // 부트페이 정보 동의 창 보이기 여부
@@ -182,7 +185,7 @@
                         url: '/insertOrderList',
                         type: 'POST',
                         data: {
-                            area_nm: 'XX휴게소',            // 휴게소 이름
+                            area_nm: area_nm,            // 휴게소 이름
                             total_cost: totalPrice,         // 총 가격
                             phone_no: '010-3101-8031',      // 주문자 번호
                             lists: JSON.stringify(items),   // 주문 내역
@@ -210,6 +213,21 @@
             }
         });
     });
+
+    function getQueryStringObject() {
+        var a = window.location.search.substr(1).split('&');
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i) {
+            var p = a[i].split('=', 2);
+            if (p.length == 1) {
+                b[p[0]] = "";
+            } else {
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+        }
+        return b;
+    }
 </script>
 <!--
     $("#removeBtn").click(() => {

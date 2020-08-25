@@ -8,8 +8,8 @@ var expressLayouts = require("express-ejs-layouts");
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
-  database: "mydb",
+  password: "12qw!@QW",
+  database: "test",
 });
 
 // views

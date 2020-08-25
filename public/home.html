@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="home.html">Rest Area Reservation</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#home" data-toggle="tab">Home</a></li>
+                    <li><a href="#restAreaInfo" data-toggle="tab">휴게소정보</a></li>
+                    <li><a href="#menuInfo" data-toggle="tab">메뉴정보</a></li>
+                    <li><a href="#cart" data-toggle="tab">장바구니</a></li>
+                    <li><a href="#orderHistory" data-toggle="tab">주문내역</a></li>
+                </ul>
+                <form class="navbar-form navbar-right" action="home.html">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="search" />
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <i class="glyphicon glyphicon-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="tab-content" style="margin-top: 50px;">
+        <!-- home -->
+        <div class="tab-pane fade in active" id="home">
+            <div class="container">
+                <div class="page-header">
+                    <h3>지도</h3>
+                </div>
+                <!-- 지도 -->
+                <div id="googleMap" style="width: 100%; height: 400px;"></div>
+                <script>
+                    function myMap() {
+                        var mapProp = {
+                            center: new google.maps.LatLng(51.508742, -0.12085),
+                            zoom: 5,
+                        };
+                        var map = new google.maps.Map(
+                            document.getElementById("googleMap"),
+                            mapProp
+                        );
+                    }
+                </script>
+                <script
+                    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBiMcetkucd-0rpow73V9VqJ_iOkuvw44E&callback=myMap"></script>
+            </div>
+            <div class="container">
+                <div class="page-header">
+                    <h3>근처 휴게소목록</h3>
+                </div>
+                <div class="list-group">
+                    <li class="list-group-item" style="list-style: none;">
+                        <div class="row">
+                            <div class="col-xs-9">
+                                <span>건천(부산)휴게소</span>
+                            </div>
+                            <div class="col-xs-2">
+                                <button class="btn btn-info">정보보기</button>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item" style="list-style: none;">
+                        <div class="row">
+                            <div class="col-xs-9">
+                                <span>건천(서울)휴게소</span>
+                            </div>
+                            <div class="col-xs-2">
+                                <button class="btn btn-info">정보보기</button>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item" style="list-style: none;">
+                        <div class="row">
+                            <div class="col-xs-9">
+                                <span>검단졸음쉼터(서울)</span>
+                            </div>
+                            <div class="col-xs-2">
+                                <button class="btn btn-info">정보보기</button>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item" style="list-style: none;">
+                        <div class="row">
+                            <div class="col-xs-9">
+                                <span>검단졸음쉼터(부산)</span>
+                            </div>
+                            <div class="col-xs-2">
+                                <button class="btn btn-info">정보보기</button>
+                            </div>
+                        </div>
+                    </li>
+
+                </div>
+            </div>
+        </div>
+        <!-- 휴게소 정보 -->
+        <div class="tab-pane" id="restAreaInfo">
+            <div class="container">
+                <div class="page-header">
+                    <h3>휴게소정보</h3>
+                </div>
+                <div class="well">
+                    <h5>
+                        <strong>
+                            휴게소명
+                        </strong> 
+                        <small>
+                            건천(부산) 휴게소
+                        </small>
+                    </h5>
+                    <h5>
+                        <strong>주소</strong>
+                        <small>
+                            경북 경주시 건천읍 경부고속도로 77
+                        </small>
+                    </h5>
+                    <h5><strong>본부명</strong>
+                        <small>
+                            대구경북본부
+                        </small>
+                    </h5>
+                    <h5><strong>노선명</strong>
+                        <small>
+                            경부선
+                        </small>
+                    </h5>
+                    <h5><strong>전화번호</strong>
+                        <small>
+                            033-648-8850
+                        </small>
+                    </h5>
+                    <h5><strong>운영시간</strong>
+                        <small>
+                            00:00 ~ 23:59
+                        </small>
+                    </h5>
+                    <div class="row">
+                        <div class="col-xs-5">
+                        </div>
+                        <div class="col-xs-5">
+                            <button class="btn btn-info">주문하기</button>
+                        </div>
+                        <div class="col-xs-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 메뉴 정보 -->
+        <div class="tab-pane" id="menuInfo">
+            <div class="container">
+                <div class="page-header">
+                    <h3>메뉴정보</h3>
+                </div>
+                <div class="well">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item">김치찌개</a>
+                        <a href="#" class="list-group-item">김치라면</a>
+                        <a href="#" class="list-group-item">치즈라면</a>
+                    </div>
+                    <div>
+                        <input type="button" class="btn btn-info" value="장바구니 담기"></input>
+                        <input type="submit" class="btn btn-info" value="주문하기"></input>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 장바구니 -->
+        <div class="tab-pane" id="cart">
+            <div class="container">
+                <div class="page-header">
+                    <h3>장바구니</h3>
+                </div>
+                <div class="well">
+                    <div class="panel-group">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <input type="checkbox" name="" id="" />
+                                <span>
+                                    김치찌개
+                                </span>
+                            </div>
+                            <div class="panel-body">
+                                <div class="container" style="align-items: center;">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <p>수량</p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <button type="button" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-minus"></span>
+                                            </button>
+                                            <input type="text" style="width: 40px;">
+                                            <button type="button" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <p>4,000원</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-group">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <input type="checkbox" name="" id="" />
+                                <span>
+                                    치즈라면
+                                </span>
+                            </div>
+                            <div class="panel-body">
+                                <div class="container" style="align-items: center;">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <p>수량</p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <button type="button" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-minus"></span>
+                                            </button>
+                                            <input type="text" style="width: 40px;">
+                                            <button type="button" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <p>4,000원</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-group">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <input type="checkbox" name="" id="" />
+                                <span>
+                                    김치라면
+                                </span>
+                            </div>
+                            <div class="panel-body">
+                                <div class="container" style="align-items: center;">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <p>수량</p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <button type="button" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-minus"></span>
+                                            </button>
+                                            <input type="text" style="width: 40px;">
+                                            <button type="button" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <p>4,000원</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <h3>총 상품 가격</h3>
+                            </div>
+                            <div class="col-sm-3">
+                                <h3><small>12,000원</small></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="container">
+                        <a href="#" class="btn btn-success">
+                            <span class="glyphicon glyphicon-ok"></span> 결제하기
+                        </a>
+                        <a href="#" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-remove"></span> 삭제하기
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 주문 내역 -->
+        <div class="tab-pane" id="orderHistory">
+            <div class="container">
+                <div class="page-header">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <h3>주문내역</h3>
+                        </div>
+                        <div class="col-xs-6">
+                            <form class="navbar-form navbar-right" action="home.html">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search" name="search" />
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default" type="submit">
+                                        <i class="glyphicon glyphicon-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+                </div>
+                <div class="well">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-3">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">2020-08-22</div>
+                                    <div class="panel-body">
+                                        <div class="text-center">
+                                        <h4>건천(부산) 휴게소</h4>
+                                        <h4><small><span>김치라면</span> 외 <span>1</span>개 <span>15000</span>원</small></h4>
+                                        <hr>
+                                        <!-- Trigger the modal with a button -->
+                                            <button class="btn btn-info" id="orderDetail">주문상세</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <div class="col-sm-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

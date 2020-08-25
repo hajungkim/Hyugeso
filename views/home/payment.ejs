@@ -18,7 +18,7 @@
     <hr />
     <button onclick="payRequest()">결제</button>
     <script>
-      var payRequest = () => {
+      const payRequest = () => {
         BootPay.request({
           price: '1000', //실제 결제되는 가격
           application_id: '5f34ea102fa5c20025eecac0',

@@ -109,6 +109,8 @@ function createOrderInfo (connection) {
     connection.query(
         `CREATE TABLE order_info_tb (
             order_no varchar(15) primary key,
+            area_nm varchar(30) character set utf8 not null,
+            total_cost varchar(10) not null,
             orderer_pn varchar(13) not null
         )`,
         function(error, result, fields) {
@@ -126,11 +128,11 @@ function createOrderFoodInfo (connection) {
     return new Promise( (resolve, reject) => {
     connection.query(
         `CREATE TABLE order_food_info_tb (
-            order_no varchar(15) primary key,
-            food_code varchar(5) not null,
-            area_code varchar(5) not null,
-            menu_code varchar(5) not null,
-            orderer_pn varchar(13) not null
+            order_no varchar(15) not null,
+            food_nm varchar(30) not null,
+            food_price int(5) not null,
+            food_cnt int(5) not null,
+            total_price int(6) not null
         )`,
         function(error, result, fields) {
             if(error) {
@@ -148,7 +150,8 @@ function createOrdererInfo (connection) {
         connection.query(
         `CREATE TABLE orderer_info_tb (
             orderer_pn varchar(13) primary key,
-            orderer_nm varchar(10) not null
+            orderer_nm varchar(10) not null,
+            order_no varchar(15) not null
         )`,
         function(error, result, fields) {
             if(error) {
@@ -159,7 +162,6 @@ function createOrdererInfo (connection) {
         }); 
     })
 }
-
 
 
 // DB create

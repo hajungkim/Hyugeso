@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<script src="https://cdn.bootpay.co.kr/js/bootpay-3.2.6.min.js" type="application/javascript"></script>
+
+<body>
+<!-- 주문 내역 -->
+<div class="tab-pane" id="orderHistory">
+    <div class="container">
+        <div class="page-header">
+            <div class="row">
+
+                <div class="col-xs-6">
+                    <h3>주문내역</h3>
+                </div>
+
+                <div class="col-xs-6">
+                    <div class="navbar-form navbar-right">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <select id='gigan' class="form-control">
+                                    <option class="nowDate">오늘</option>
+                                    <option class="wholeDate">전체</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <input id='phoneNum' type="text" class="form-control"/>
+                                <div class="input-group-btn">
+                                    <button id='btnSearch' class="btn btn-default">
+                                        <i class="glyphicon glyphicon-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="container">
+                <div id='orderList' class="row">
+                    <div class="col-sm-1"></div>
+
+                    <!-- <div class="col-sm-2"></div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    const ajax = $.ajax;
+    // 핸드폰번호 입력후 검색 버튼 클릭시 이벤트
+    $('#btnSearch').click( function() {
+        const phoneNum = document.getElementById('phoneNum').value;
+        const gigan = $('#gigan option:selected').val();
+        console.log(gigan);
+        console.log(phoneNum);
+        
+        ajax({
+            url: 'requestOrderList',
+            type: 'POST',
+            data: {
+                gigan : gigan,
+                phone_no : phoneNum,
+            },
+            success: function(data) {
+                console.log(data);
+                drawOrderList(data);
+            }
+        });
+    })
+
+    // 주문내역 리스트 그리기
+    function drawOrderList(data) {
+        const div = document.getElementById('orderList');
+        let html = '';
+        for(i in data) {
+            const area_nm = data[i].area_nm;
+            const order_no = data[i].order_no;
+            const total_cost = data[i].total_cost;
+
+            let order_date = order_no.substr(2,8);
+            var formatted = order_date.slice(0, 4) + "-" + order_date.slice(4, 6) + "-" + order_date.slice(6);
+
+            console.log(i);
+            const items= `
+                <div class="col-sm-3">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">${formatted}</div>
+                            <div class="panel-body">
+                                <form id="info" methon="post" action="orderDetail" target="open">
+                                    <input type="hidden" name="order_no" value=${order_no}>
+                                    <h4>${area_nm}</h4>
+                                    <h4>${order_no}</h4>
+                                    <h4><small><span>총 결제 금액 : </span><span>${total_cost}</span>원</small></h4>
+                                    <br>
+                                    <button onClick='openWin()' class="btn btn-info">주문상세</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+            html += items;
+        }
+
+        div.innerHTML = html;
+    }
+
+    // 상세주문 팝업 
+    function openWin() {
+        window.open("./orderDetail","open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
+        $("#info").submit();
+    }
+</script>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modal</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+    <!-- Modal -->
+    <!-- <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header"" >
+                    <button type=" button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">주문번호</h4>
+            </div>
+            <div class="modal-body">
+                <p>고객님의 주문번호는 <strong>000061</strong>입니다.</p>
+                <p>예상 조리완성 시간은<strong>오후 06:00</strong>입니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div> -->
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            &times;
+          </button>
+          <h4 class="modal-title">주문상세보기</h4>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <th>주문내역</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>김치라면</td>
+                  <td>1개</td>
+                  <td>4000원</td>
+                </tr>
+                <tr>
+                  <td>치즈라면</td>
+                  <td>1개</td>
+                  <td>4000원</td>
+                </tr>
+                <tr>
+                  <td>해물라면</td>
+                  <td>1개</td>
+                  <td>4000원</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-xs-8">
+              <h5><strong>주문 일시</strong></h5>
+              <h5><strong>결제 금액</strong></h5>
+            </div>
+            <div class="col-xs-4">
+              <h5>
+                <small><span>2020-08-22</span></small>
+              </h5>
+              <h5>
+                <small>
+                  <span>12000</span>
+                  원
+                </small>
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+            id="closeBtn"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<script>
+  $('.close').click(() => {
+    self.close()
+  })
+  $('#closeBtn').click(() => {
+    self.close()
+  })
+</script>

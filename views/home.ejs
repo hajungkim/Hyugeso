@@ -11,14 +11,16 @@
     ></script>
   </head>
   <body>
-    <div id="kakaoMap" style="width: 40%; height: 400px;">
+
+    <div id="kakaoMap" style="width: 100%%; height: 400px;">
     </div>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d698315979c98f65a32752dc88bd959d"></script>
-
+    <script
+    type="text/javascript"
+   src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xx81d8228c35324ed3be2ba79ed4c15a67"></script>
     <div id='restareaList' style="width: 40%; height: 400px; overflow: scroll; overflow-x: hidden">
       <form action="/restAreaInfo">
         <ul id='listItems'>
-            <!-- 휴게소 목록 리스트 -->
         </ul>
       </form>
     </div>
@@ -27,23 +29,100 @@
 
 <!-- home 화면 로딩 되면, 휴게소좌표 찍기위해서 데이터 요청 -->
 <script>
-    var cnt = 0;
-    var userPosition = {
-        lat : null,
-        lon : null,
-    };
-    $.ajax({
-        url: '/requestRestAreaLatLong',
-        type: 'POST',
-        success: function(data) {
-            const results = JSON.parse(data);
-            // console.log(result);
-            var map = drawRestAreaMarker(results);
-            drawUserMarker(results, map);
+    const ajax = $.ajax;
+    let rName;
+    mainFlow();
+
+    function mainFlow() {
+        //console.log('A');
+        getLoadNm();
+        //console.log('B');
+    }
+
+    async function getUserPosition(){
+        return new Promise((resolve, reject)=>{
+            var userPosition = {
+                lat : null,
+                lon : null,
+            };
+            navigator.geolocation.getCurrentPosition(function(position){
+                userPosition.lat = position.coords.latitude;
+                userPosition.lon = position.coords.longitude;
+                console.log('a', userPosition.lat, userPosition.lon);
+                if(userPosition.lat == null || userPosition.lon == null){
+                    console.log('b', userPosition.lat, userPosition.lon);
+                } else {
+                    console.log('2');
+                    resolve(userPosition);
+                }
+            })
+        })
+    }
+
+    
+    async function getLoadNm() {
+        
+        //현재위치 받아오는거 막음
+        //const latlng = await getUserPosition();
+
+        const latlng = {
+            lat : 37.2651139800,
+            lon : 127.4036901000,
         }
-    })
+
+        // T map 도로명 API
+        ajax({
+            method:"GET",
+            //url:"http://223.39.119.112/tmapv20/road/nearToRoad?version=1",//가까운 도로 찾기 api 요청 url입니다.
+            url:"https://apis.openapi.sk.com/tmap/road/nearToRoad?version=1",//가까운 도로 찾기 api 요청 url입니다.
+            async : false,
+            data:{
+                "appKey" : "l7xx81d8228c35324ed3be2ba79ed4c15a67",
+                "lon" : latlng.lon,
+                "lat" : latlng.lat,
+            },
+            success:function(response){
+                
+                var resultHeader, resultlinkPoints;
+                
+                resultHeader = response.resultData.header;
+                resultlinkPoints = response.resultData.linkPoints;
+                
+                rName = resultHeader.roadName;
+                console.log("rName : ",rName);
+
+                ajax({
+                    url: '/requestRestAreaLatLong',
+                    type: 'POST',
+                    async : false,
+                    // data : {
+                    //     road_nm : rName,
+                    // },
+                    success: function(data) {
+                        const results = JSON.parse(data);
+                        var map = drawRestAreaMarker(results);
+                        drawUserMarker(results, map, latlng);
+                    }
+                });
+            
+                    
+            },
+            error:function(request,status,error){
+                console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            }
+        });
+    }
+
     // 휴게소 목록 리스트 그리기
     function drawList(results, currentPos) {
+         var iValue = rName.indexOf("고속도로");
+        if(iValue != -1)
+        {
+            rName = rName.substring(0,iValue);
+        }
+
+        console.log(rName);
+        
         const ul = document.getElementById('listItems');
         while(ul.firstChild) {
             ul.removeChild(ul.firstChild);
@@ -53,28 +132,32 @@
         submit.value = '휴게소 정보';
         var result_distance = new Array(results.Size);
         for(i in results) {
-            var distance = {
-                lat : results[i].latitude,
-                lon : results[i].longitude,
+            var restArea_roadName = results[i].road_nm;
+            restArea_roadName = restArea_roadName.substring(0,restArea_roadName.length-1);
+            if(restArea_roadName == rName){
+                var distance = {
+                    lat : results[i].latitude,
+                    lon : results[i].longitude,
+                }
+                result_distance[i] = new Array(2);
+                var dis = computeDistance(currentPos, distance);
+                result_distance[i] = [dis,i];
+                results[i].road_nm = restArea_roadName;
             }
-            result_distance[i] = new Array(2);
-            var dis = computeDistance(currentPos, distance);
-            result_distance[i] = [dis,i];
-            //result_distance[i] = [calculateDistance(distance.lat, distance.lon, currentPos.lat, currentPos.lon),i];
+            result_distance.sort(sortFunction);
+            function sortFunction(a,b){
+                return (a[0] < b[0]) ? -1 : 1;
+            }
         }
-        result_distance.sort(sortFunction);
-        function sortFunction(a,b){
-            return (a[0] < b[0]) ? -1 : 1;
-        }
-        
-        for(var i=0; i<5; i++){
+
+        for(var i=0; i<6; i++){
             var idx = result_distance[i][1];
             const li = document.createElement('li');
             const label = document.createElement('label');
             label.for = results[idx].area_code;
             label.innerHTML = results[idx].area_nm;
             const input = document.createElement('input');
-            input.type = 'checkbox';
+            input.type = 'radio';
             input.id = results[idx].area_code;
             input.name = 'area_code';
             input.value = results[idx].area_code;
@@ -86,61 +169,34 @@
             ul.appendChild(br);
         }
         ul.appendChild(submit);
-
     }
+ 
+ 
     // 지도그리기
-    function drawUserMarker(results, map) {
+    function drawUserMarker(results, map, userPosition) {
         // 현재 입력받은 위치 - 마커표시
         var marker;
-        if(navigator.geolocation) {
-            //촉
-            if(userPosition.lat == null && userPosition.lon == null) {
-                navigator.geolocation.getCurrentPosition(function(position){
-                    userPosition.lat = position.coords.latitude;
-                    userPosition.lon = position.coords.longitude;
-
-                    var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png', // 마커이미지의 주소입니다    
-                        imageSize = new kakao.maps.Size(32, 30), // 마커이미지의 크기입니다
-                        imageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
-            
-                    // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
-                    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
-                    let lat = position.coords.latitude,
-                        lon = position.coords.longitude;
-                    // 현재 위치를 중심으로 지도 생성
-                    map.setCenter(new kakao.maps.LatLng(lat, lon));
-                    // 마커 위치
-                    var markerPosition  = new kakao.maps.LatLng(lat, lon); 
-                    marker = new kakao.maps.Marker({
-                        position:markerPosition,
-                        image: markerImage // 마커이미지 설정 
-                    });
-                    marker.setMap(map);
-                    
-                    drawList(results, userPosition);
-                });
-            }
-            else {
-                navigator.geolocation.watchPosition(function(position){
-                    console.log("position : ", position);
-                    marker.setPosition(userPosition.lat, userPosition.lon);
-
-                    var changePosition = {
-                        lat : position.coords.latitude,
-                        lon : position.coords.longitude,
-                    }
-                    marker.setMap(map);
-                    var dis = computeDistance(userPosition, changePosition);
-                    console.log(dis);
-                    if(dis >= 1){
-                        drawList(results, {lat,lon});
-                    }
-                });
-            }
-            
-        }
+        var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png', // 마커이미지의 주소입니다    
+            imageSize = new kakao.maps.Size(32, 30), // 마커이미지의 크기입니다
+            imageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+        var lat = userPosition.lat;
+        var lon = userPosition.lon;
+        // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+        var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+        // 현재 위치를 중심으로 지도 생성
+        map.setCenter(new kakao.maps.LatLng(lat, lon));
+        // 마커 위치
+        var markerPosition  = new kakao.maps.LatLng(lat, lon); 
+        marker = new kakao.maps.Marker({
+            position:markerPosition,
+            image: markerImage // 마커이미지 설정 
+        });
+        marker.setMap(map);
+        
+        drawList(results, userPosition);
     }
-
+ 
+ 
     function drawRestAreaMarker(data) {
         var data = data;
         // var mapContainer = document.createElement("div");
@@ -163,19 +219,19 @@
                 latitude: data[i].latitude,
                 longitude: data[i].longitude,
             }
-            // console.log(areaInfo);
             var marker = new kakao.maps.Marker({
                 map: map,
                 position: new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude),
                 title: areaInfo.name,
                 clickable : true
             });
-            marker.setMap(map);
+            
             kakao.maps.event.addListener(marker, 'click', makeOverListener(map, marker, infowindow, areaInfo));
         }
         return map;
     }
-
+  
+  
     function makeOverListener(map, marker, infowindow, areaInfo) {
         return function() {
             var iwContent =  `<div class="wrap">
@@ -197,8 +253,8 @@
             infowindow.open(map,marker);
         };
     }
-
-
+ 
+ 
     function computeDistance(startCoords, destCoords) {
         var startLatRads = degreesToRadians(startCoords.lat);
         var startLongRads = degreesToRadians(startCoords.lon);
@@ -210,10 +266,8 @@
                         Math.cos(startLongRads - destLongRads)) * Radius;
         return distance;
     }
-
     function degreesToRadians(degrees) {
         radians = (degrees * Math.PI)/180;
         return radians;
     }
-
 </script>

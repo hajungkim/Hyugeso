@@ -36,6 +36,9 @@
 
 <!-- home 화면 로딩 되면, 휴게소좌표 찍기위해서 데이터 요청 -->
 <script>
+
+    localStorage.removeItem('cartItem');
+
     var cnt = 0;
     var userPosition = {
         lat : null,

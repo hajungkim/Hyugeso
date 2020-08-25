@@ -109,7 +109,6 @@ app.post("/requestMenuInfo", async function (req, res) {
 app.post("/requestOrderList", function (req, res) {
   const phone_no = req.body.phone_no;
   const gigan = req.body.gigan;
-  
   // 오늘 날짜 yyyymmdd 형태로 만들기
   const date = new Date();
   const year = date.getFullYear().toString();
@@ -136,7 +135,20 @@ app.post("/requestOrderList", function (req, res) {
       res.send(result);
     }
   });
-});
+})
+
+app.post("/requestOrderInfo", function (req, res) {
+    const order_no = req.body.order_no;
+  
+    connection.query('SELECT * FROM order_food_info_tb WHERE order_no = ?', [order_no], function(error, result, fields) {
+      if(error) { 
+        throw error;
+      } else {
+        res.send(result);      
+      }
+    });
+  })
+
 
 // 메뉴API(공공데이터) 사용해서 메뉴 가져오기
 getMenuInfo = async (areaName) => {
@@ -187,13 +199,14 @@ app.post("/insertOrderList", async function (req, res) {
         console.log(jsonData[i]);
         const name = jsonData[i].item_name;
         const cnt = jsonData[i].qty;
-        const price = jsonData[i].cost;
+        const price = jsonData[i].price;
 
         const SQL2 = {
           order_no: order_no,
           food_nm: name,
           food_cnt: cnt,
           food_price: price,
+          total_price: price * cnt,
         };
 
         connection.query("INSERT INTO order_food_info_tb SET ?", SQL2, function (error, result, fields) {

@@ -101,11 +101,14 @@
                     <div class="panel panel-info">
                         <div class="panel-heading">${formatted}</div>
                             <div class="panel-body">
-                                <h4>${area_nm}</h4>
-                                <h4>${order_no}</h4>
-                                <h4><small><span>총 결제 금액 : </span><span>${total_cost}</span>원</small></h4>
-                                <br>
-                                <button onClick='openWin()' class="btn btn-info">주문상세</button>
+                                <form id="info" methon="post" action="orderDetail" target="open">
+                                    <input type="hidden" name="order_no" value=${order_no}>
+                                    <h4>${area_nm}</h4>
+                                    <h4>${order_no}</h4>
+                                    <h4><small><span>총 결제 금액 : </span><span>${total_cost}</span>원</small></h4>
+                                    <br>
+                                    <button onClick='openWin()' class="btn btn-info">주문상세</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -120,6 +123,7 @@
 
     // 상세주문 팝업 
     function openWin() {
-        window.open("./orderDetail","_blank","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
+        window.open("./orderDetail","open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
+        $("#info").submit();
     }
 </script>

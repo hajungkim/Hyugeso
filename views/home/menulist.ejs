@@ -55,15 +55,15 @@
         area_nm: areaName,
       },
       success: function (data) {
-        resultMenuList(data);
         console.log(data, data.length);
 
         // API에서 휴게소 메뉴 못받아오면 에러처리
         if (data.length == 0) {
           alert('휴게소에 음식이 없습니다.');
           window.location.href = '/home';
+        } else {
+          resultMenuList(data);
         }
-        //drawMenuList(data);
       }
     });
 

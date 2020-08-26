@@ -188,6 +188,7 @@
             let totalPrice = 0;
             let orderList = [];
             let orderListCnt = document.getElementsByName("menuCheckBox").length;
+
             for (let i = 0; i < orderListCnt; i++) {
                 let orderItem = {};
 
@@ -276,11 +277,12 @@
 
         // 장바구니 삭제
         $("#removeBtn").click(() => {
+            // debugger;
             let checkedMenu = $("input:checked");
             if (checkedMenu) {
 
                 $('input:checked').each(function () {
-                    var unique = `${this.value}price`;
+                    var unique = `${this.value}total`;
                     var removedPrice = document.getElementById("" + unique + "").innerHTML;
                     totalPrice -= removedPrice;
                 })

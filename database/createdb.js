@@ -129,7 +129,7 @@ function createOrderInfo (connection) {
         `CREATE TABLE order_info_tb (
             order_no varchar(15) primary key,
             orderer_pn varchar(13) not null,
-            order_time date not null,
+            order_time datetime default now(),
             pay_id varchar(40) not null,
             area_nm varchar(30) character set utf8 not null,
             total_cost int not null,

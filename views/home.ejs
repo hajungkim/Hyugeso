@@ -51,7 +51,7 @@
     </div>
 
     <div class="list-group" id='restareaList' style="margin:20px">
-        <form id='formListItems' >
+        <!-- <form id='formListItems' > -->
             <div id='listItems'>
                 
             </div>
@@ -59,7 +59,7 @@
                 <button id='btnShowInfo' onclick="showAreaInfo(this)" class="btn btn-info">정보보기</button>
                 <button id='btnShowMenu'' onclick="showAreaInfo(this)" class="btn btn-info">메뉴보기</button>
             </div>
-        </form>
+        <!-- </form> -->
     </div>
 </body>
 
@@ -193,7 +193,7 @@
                                 <strong>${results[idx].area_nm}휴게소</strong>까지 약 <strong>${result_distance[i][0].toFixed(2)}</strong> KM
                             </div>
                             <div class="col-xs-2">
-                                <input type="radio" name="area_code" value="${results[idx].area_code}" id="${results[idx].area_code}">
+                                <input type="radio" name="area_code" value="${results[idx].area_code}&${results[idx].area_nm}">
                             </div>
                         </div>
                     </a>`
@@ -303,26 +303,24 @@
         return radians;
     }
 
-    // 정보보기 눌렀을때 아무것도 선택안하는 경우 예외처리
+    // 정보보기, 메뉴보기 버튼 클릭시 이벤트처리 및 예외처리
     function showAreaInfo(btn) {
-        debugger;
+        const checkedArea = $("input:radio[name=area_code]:checked").val();
+        console.log(checkedArea);
         
-        console.log(btn);
-
-        let a = $("input:radio[name=area_code]:checked").val();
-        if(a == undefined) {
+        if(checkedArea == undefined) {
             alert('휴게소를 선택하세요');
-            location.reload();
         } else {
-            const btnId = btn.id;
-            // let b = $("input:radio[name=area_code]:checked").id();
+            let code = checkedArea.substring(0, checkedArea.indexOf('&'));
+            let name = checkedArea.substring(checkedArea.indexOf('&')+1, checkedArea.length);
+            console.log(code,name);
 
+            const btnId = btn.id;
             if(btn.id == 'btnShowInfo') {
-                $('#formListItems').attr('action', '/restAreaInfo')
+                window.location.href = `/restAreaInfo?area_code=${code}`;
             } else {
-                $('#formListItems').attr('action', '/menuList')
+                window.location.href = `/menuList?area_nm=${name}`;
             }
-            $('#btnShowInfo').submit();
         }
     }
 

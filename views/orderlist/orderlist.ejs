@@ -92,16 +92,15 @@
             const order_no = data[i].order_no;
             const total_cost = data[i].total_cost;
             const pay_id = data[i].pay_id;
+            const cancel_yn = data[i].cancel_yn;
             const serving_yn = data[i].serving_yn;
-            let flag = 'false';
+            let flag = '';
 
             let order_date = order_no.substr(2,8);
             var formatted = order_date.slice(0, 4) + "-" + order_date.slice(4, 6) + "-" + order_date.slice(6);
 
-            console.log(serving_yn);
             if(serving_yn == 'Y') {
-                console.log('serving ok');
-                flag = 'true';
+                flag = 'disabled';
             }
 
             console.log(i);
@@ -110,36 +109,47 @@
                     <div class="panel panel-info">
                         <div class="panel-heading">${formatted}</div>
                             <div class="panel-body">
-                                <form id="info" methon="post" action="orderDetail" target="open">
-                                    <input type="hidden" name="order_no" value=${order_no}>
-                                    <h4>${area_nm}</h4>
-                                    <h4>${order_no}</h4>
-                                    <h4><small><span>총 결제 금액 : </span><span>${total_cost}</span>원</small></h4>
-                                    <br>
-                                    <button onClick='openWin()' class="btn btn-info">주문상세</button>
-                                    <button onClick='cancelOrder()' class="btn btn-danger" disabled="${flag}">주문취소</button>
-                                </form>
+                                <h4>${area_nm}</h4>
+                                <h4>${order_no}</h4>
+                                <h4><small><span>총 결제 금액 : </span><span>${total_cost}</span>원</small></h4>
+                                <br>
+                                <button onClick='openWin(this)' class="btn btn-info">주문상세</button>
+                                <button onClick='cancelOrder(this)' class="btn btn-danger" ${flag}>주문취소</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 `;
-
-            html += items;
+            if(cancel_yn == 'N') {
+                html += items;
+            }
         }
-
         div.innerHTML = html;
     }
 
     // 상세주문 팝업 
-    function openWin() {
-        window.open("./orderDetail","open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
-        $("#info").submit();
+    function openWin(btn) {
+        const order_no = btn.parentNode.childNodes[3].innerHTML;
+        window.open(`./orderDetail?order_no=${order_no}`,"open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
     }
 
     // 주문취소 프로세스
-    function cancelOrder() {
+    function cancelOrder(btn) {
         alert('주문취소 프로세스 진행 해야함');
+        const order_no = btn.parentNode.childNodes[3].innerHTML;
+        console.log(order_no);
+
+        ajax({
+            url: 'requestPayCancel',
+            type: 'POST',
+            data: {
+                order_no: order_no,
+            },
+            success: function(data) {
+                console.log(data);
+                window.location.href = '/orderList';
+            }   
+        })
     }
 
 </script>

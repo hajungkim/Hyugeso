@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<script src="https://cdn.bootpay.co.kr/js/bootpay-3.2.6.min.js" type="application/javascript"></script>
+
+<body>
+    <!-- 장바구니 -->
+    <div class="tab-pane" id="cart">
+        <div class="container">
+            <div class="page-header">
+                <h3>주문 완료</h3>
+            </div>
+            <div class="well">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="panel panel-info">
+                                <div id='orderDate' class="panel-heading"></div>
+                                    <div class="panel-body">
+                                        <form id="info" methon="post" action="orderDetail" target="open">
+                                            <input type="hidden" name="order_no" value=${order_no}>
+                                            <h4 id='orderArea'></h4>
+                                            <h4 id='orderNumber'></h4>
+                                            <h4><small><span>총 결제 금액 : </span><span id='totalPrice'></span>원</small></h4>
+                                            <br>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="container">
+                    <button class="btn btn-success" onclick="moveHome()">
+                        <span></span> Home
+                    </button>
+                    <button class="btn btn-success" onclick="moveOrderList()">
+                        <span></span> OrderList
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    
+    const qs = getQueryStringObject();
+    console.log(qs);
+    const orderArea = qs.area_nm;
+    const orderNumber = qs.order_no;
+    const totalPrice = qs.total_cost;
+    const tempDate = orderNumber.substr(2,8);
+    const orderDate = tempDate.slice(0,4) + '-' + tempDate.slice(4,6) + '-' + tempDate.slice(6);
+
+    document.getElementById('orderDate').innerHTML = orderDate;
+    document.getElementById('orderArea').innerHTML = orderArea;
+    document.getElementById('orderNumber').innerHTML = orderNumber;
+    document.getElementById('totalPrice').innerHTML = totalPrice;
+
+    function getQueryStringObject() {
+        var a = window.location.search.substr(1).split('&');
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i) {
+            var p = a[i].split('=', 2);
+            if (p.length == 1) {
+                b[p[0]] = "";
+            } else {
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+        }
+        return b;
+    }
+
+    function moveHome() {
+        window.location.href = '/home';
+    }
+
+    function moveOrderList() {
+        window.location.href = '/orderList';
+    }
+</script>

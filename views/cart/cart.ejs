@@ -46,6 +46,19 @@
 </html>
 
 <script>
+
+    // 메뉴 안고르고 카트로 올 경우 예외처리
+    // for(var i=0; i<localStorage.length; i++) {
+    //     console.log(localStorage.key(i))
+    // }
+
+    if(localStorage) {
+        alert('장바구니에 상품을 추가해주세요.');
+        // window.location.href = '/menulist';
+    }
+
+
+
     const qs = getQueryStringObject();
     let area_nm = qs.area_nm;
 
@@ -60,7 +73,6 @@
         totalPrice = totalPrice + (item.qty * item.price);
     }
     $(() => {
-
         $("#totalPrice").text(totalPrice);
         // 메뉴 개수에 따른 장바구니 목록 출력
         for (item of cartItems) {
@@ -226,6 +238,7 @@
                         success: function (data) {
                             // 결제완료시 주문번호 리턴
                             console.log(data);
+                            window.location.href = `/cartOk?order_no=${data}&area_nm=${area_nm}&total_cost=${totalPrice}`
                         }
                     });
                 })

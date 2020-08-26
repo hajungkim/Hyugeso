@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modal</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+    <!-- Modal -->
+    <!-- <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header"" >
+                    <button type=" button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">주문번호</h4>
+            </div>
+            <div class="modal-body">
+                <p>고객님의 주문번호는 <strong>000061</strong>입니다.</p>
+                <p>예상 조리완성 시간은<strong>오후 06:00</strong>입니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div> -->
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            &times;
+          </button>
+          <h4 class="modal-title">주문상세보기</h4>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                  <th>주문내역</th>
+                  <th>단가</th>
+                  <th>수량</th>
+                  <th>금액</th>
+                </thead>
+               <tbody id="orderList">
+              </tbody>
+            </table>
+          </div>
+          <hr />
+          <div class="row" id="info">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+            id="closeBtn"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+  const qs = getQueryStringObject();
+  let order_no = qs.order_no;
+  
+  console.log(qs.order_no);
+
+  $.ajax({
+        url: '/requestOrderInfo',
+        type: 'POST',
+        data: {
+            order_no: order_no, 
+        },
+        success: function (data) {
+            drawOrderInfo(data);
+        }
+    });
+
+    function drawOrderInfo(data) {
+        const table = document.getElementById('orderList');
+        const div = document.getElementById('info');
+        let html = '';
+        let html2 = '';
+        for(i in data) {
+            const food_nm = data[i].food_nm;
+            const food_price = data[i].food_price;
+            const food_cnt = data[i].food_cnt;
+            const total_price = data[i].total_price;
+
+            const items= `
+              <tbody>
+                <tr>
+                  <td>${food_nm}</td>
+                  <td>${food_price}</td>
+                  <td>${food_cnt}</td>
+                  <td>${total_price}</td>
+                </tr>
+              </tbody>
+                `;
+
+            html += items;
+        }
+        
+        let order_date = order_no.substr(2,8);
+        var formatted = order_date.slice(0, 4) + "-" + order_date.slice(4, 6) + "-" + order_date.slice(6);
+        var cost = 0;
+
+        for (i in data) {
+          cost += data[i].total_price;
+        }
+        const item= `
+        <div class="col-xs-8">
+              <h5><strong>주문 일시</strong></h5>
+              <h5><strong>결제 금액</strong></h5>
+            </div>
+            <div class="col-xs-4">
+              <h5>
+                <small><span>${formatted}</span></small>
+              </h5>
+              <h5>
+                <small>
+                  <span>${cost}</span>
+                  원
+                </small>
+              </h5>
+            </div>`;
+
+        html2 += item;
+        table.innerHTML = html;
+        div.innerHTML = html2;
+    }
+
+    function getQueryStringObject() {
+        var a = window.location.search.substr(1).split('&');
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i) {
+            var p = a[i].split('=', 2);
+            if (p.length == 1) {
+                b[p[0]] = "";
+            } else {
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+        }
+        return b;
+    }
+
+</script>
+
+
+
+<script>
+  $('.close').click(() => {
+    self.close()
+  })
+  $('#closeBtn').click(() => {
+    self.close()
+  })
+</script>

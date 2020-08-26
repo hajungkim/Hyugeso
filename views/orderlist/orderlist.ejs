@@ -1,137 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-
+    
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <title>휴게소 바로 주문</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
 </head>
 <script src="https://cdn.bootpay.co.kr/js/bootpay-3.2.6.min.js" type="application/javascript"></script>
 
 <body>
-<!-- 주문 내역 -->
-<div class="tab-pane" id="orderHistory">
-    <div class="container">
-        <div class="page-header">
-            <h3>주문내역</h3>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                    <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="well">
-            <div class="container">
+    </nav>
+
+    <!-- 주문 내역 -->
+    <div class="tab-pane" id="orderHistory">
+        <div class="container">
+            <div class="page-header">
                 <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">2020-08-22</div>
-                            <div class="panel-body">
-                                <h4>건천(부산) 휴게소</h4>
-                                <h4><small><span>김치라면</span> 외 <span>1</span>개 <span>15000</span>원</small></h4>
-                                <br>
-                                <!-- Trigger the modal with a button -->
-                                <button class="btn btn-info" data-toggle="modal" data-target="#orderNumber">주문번호</button>
-                                <button class="btn btn-info" data-toggle="modal" data-target="#orderDetail">주문상세</button>
-                                <!-- Modal -->
-                                <div class="modal fade" id="orderNumber" role="dialog">
-                                    <div class="modal-dialog modal-sm">
-                                        <div class="modal-content">
-                                        <div class="modal-header"" >
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                            <h4 class="modal-title">주문번호</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>고객님의 주문번호는 <strong>000061</strong>입니다.</p>
-                                            <p>예상 조리완성 시간은<strong>오후 06:00</strong>입니다.</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        </div>
-                                        </div>
-                                    </div>
+
+                    <div class="col-xs-6">
+                        <h3>주문내역</h3>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="navbar-form navbar-right">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <select id='gigan' class="form-control">
+                                        <option class="nowDate">오늘</option>
+                                        <option class="wholeDate">전체</option>
+                                    </select>
                                 </div>
-                                <div class="modal fade" id="orderDetail" role="dialog">
-                                    <div class="modal-dialog modal-sm">
-                                        <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                            <h4 class="modal-title">주문상세보기</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="table-responsive">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <th>주문내역</th>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                          <td>김치라면</td>
-                                                          <td>1개</td>
-                                                          <td>4000원</td>
-                                                        </tr>
-                                                        <tr>
-                                                          <td>치즈라면</td>
-                                                          <td>1개</td>
-                                                          <td>4000원</td>
-                                                        </tr>
-                                                        <tr>
-                                                          <td>해물라면</td>
-                                                          <td>1개</td>
-                                                          <td>4000원</td>
-                                                        </tr>
-                                                      </tbody>
-                                                </table>
-                                            </div>
-                                            <hr>
-                                            <div class="row">
-                                                <div class="col-xs-8">
-                                                    <h5><strong>주문 일시</strong></h5> 
-                                                    <h5><strong>결제 금액</strong></h5> 
-                                                </div>
-                                                <div class="col-xs-4">
-                                                    <h5><small><span>2020-08-22</span></small></h5>
-                                                    <h5><small><span>12000</span>원</small></h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        </div>
-                                        </div>
+                                <div class="input-group">
+                                    <input id='phoneNum' type="text" class="form-control" placeholder="번호 11자리를 입력해주세요."/>
+                                    <div class="input-group-btn">
+                                        <button id='btnSearch' class="btn btn-default">
+                                            <i class="glyphicon glyphicon-search"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-3">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">2020-08-22</div>
-                            <div class="panel-body">
-                                <h4>건천(부산) 휴게소</h4>
-                                <h4><small><span>김치라면</span> 외 <span>1</span>개 <span>15000</span>원</small></h4>
-                                <br>
-                                <button class="btn btn-info">주문번호</button>
-                                <button class="btn btn-info">주문상세</button>
-                            </div>
-                        </div>
+
+                </div>
+            </div>
+
+            <div class="well">
+                <div class="container">
+                    <div id='orderList' class="row">
+                        <div class="col-sm-1"></div>
+
+                        <!-- <div class="col-sm-2"></div> -->
                     </div>
-                    <div class="col-sm-3">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">2020-08-22</div>
-                            <div class="panel-body">
-                                <h4>건천(부산) 휴게소</h4>
-                                <h4><small><span>김치라면</span> 외 <span>1</span>개 <span>15000</span>원</small></h4>
-                                <br>
-                                <button class="btn btn-info">주문번호</button>
-                                <button class="btn btn-info">주문상세</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2"></div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>
+
+<script>
+    const ajax = $.ajax;
+    // 핸드폰번호 입력후 검색 버튼 클릭시 이벤트
+    $('#btnSearch').click(function () {
+        const phoneNum = document.getElementById('phoneNum').value;
+        const gigan = $('#gigan option:selected').val();
+        
+        try {
+            if (phoneNum.length < 11 || phoneNum.length > 11) {
+                throw 'NaNEX';
+            }
+        } catch (ex) {
+            if (ex == 'NaNEX') {
+                document.getElementById('phoneNum').value = null;
+                alert('잘못 입력하셨습니다.');
+            }
+        }
+        console.log(gigan);
+        console.log(phoneNum);
+
+        ajax({
+            url: 'requestOrderList',
+            type: 'POST',
+            data: {
+                gigan: gigan,
+                phone_no: phoneNum,
+            },
+            success: function (data) {
+                console.log(data);
+                drawOrderList(data);
+            }
+        });
+    })
+
+    // 주문내역 리스트 그리기
+    function drawOrderList(data) {
+        const div = document.getElementById('orderList');
+        let html = '';
+        for (i in data) {
+            const area_nm = data[i].area_nm;
+            const order_no = data[i].order_no;
+            const total_cost = data[i].total_cost;
+
+            let order_date = order_no.substr(2, 8);
+            var formatted = order_date.slice(0, 4) + "-" + order_date.slice(4, 6) + "-" + order_date.slice(6);
+
+            console.log(i);
+            const items = `
+                <div class="col-sm-3">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">${formatted}</div>
+                            <div class="panel-body">
+                                <form id="info" methon="post" action="orderDetail" target="open">
+                                    <input type="hidden" name="order_no" value=${order_no}>
+                                    <h4>${area_nm}</h4>
+                                    <h4>${order_no}</h4>
+                                    <h4><small><span>총 결제 금액 : </span><span>${total_cost}</span>원</small></h4>
+                                    <br>
+                                    <button onClick='openWin()' class="btn btn-info">주문상세</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+            html += items;
+        }
+
+        div.innerHTML = html;
+    }
+
+    // 상세주문 팝업 
+    function openWin() {
+        window.open("./orderDetail", "open", "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
+        $("#info").submit();
+    }
+</script>

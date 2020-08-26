@@ -261,6 +261,21 @@ app.post("/adminRequestOrderList", function(req, res) {
   })
 })
 
+// admin 에서 휴게소이름에 따라 주문리스트 보여주기
+app.post("/adminUpdateOrderInfo", function(req, res) {
+  const orderNo = req.body.order_no;
+
+  console.log(orderNo);
+
+  // 수정
+  connection.query('UPDATE order_info_tb SET serving_yn = ? WHERE order_no = ?', ['Y', orderNo], function(error, result, fields) {
+    if(error) {
+      throw error;
+    } else {
+      console.log(result);
+    }
+  })
+})
 
 
 

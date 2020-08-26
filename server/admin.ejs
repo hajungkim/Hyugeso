@@ -70,115 +70,150 @@
             </div>
         </footer>
     </div>
+</body>
+</html>
 
-    <script src="js/jquery-3.3.1.min.js"></script>
-    <!-- https://jquery.com/download/ -->
-    <script src="js/moment.min.js"></script>
-    <!-- https://momentjs.com/ -->
-    <script src="js/Chart.min.js"></script>
-    <!-- http://www.chartjs.org/docs/latest/ -->
-    <script src="js/bootstrap.min.js"></script>
-    <!-- https://getbootstrap.com/ -->
-    <script src="js/tooplate-scripts.js"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<!-- https://jquery.com/download/ -->
+<script src="js/moment.min.js"></script>
+<!-- https://momentjs.com/ -->
+<script src="js/Chart.min.js"></script>
+<!-- http://www.chartjs.org/docs/latest/ -->
+<script src="js/bootstrap.min.js"></script>
+<!-- https://getbootstrap.com/ -->
+<script src="js/tooplate-scripts.js"></script>
 
 
-    <!-- [운영자] - 휴게소 종류 셀렉트박스 값 -->
-    <script>
-        $.ajax({
-            url: 'requestRestAreaLatLong',
+<!-- [운영자] - 휴게소 종류 셀렉트박스 값 -->
+<script>
+    $.ajax({
+        url: 'requestRestAreaLatLong',
+        type: 'POST',
+        success: function (data) {
+            const result = JSON.parse(data);
+            addSelectOption(result);
+        }
+    })
+
+    // 셀렉트박스 리스트 아이템 붙이기
+    function addSelectOption(data) {
+        const selectItem = document.getElementById('areaList');
+        for(var i=0; i < data.length; i++) {
+            console.log(data[i]);
+            var optionItem = document.createElement('option');
+            optionItem.innerHTML = data[i].area_nm;
+            optionItem.value = data[i].area_nm;
+            selectItem.appendChild(optionItem);
+        }
+    }
+</script>
+
+<!-- [운영자] - 휴게소에 들어온 주문내역 DB에 접근해서 Table 형태로 그리기 -->
+<script>
+    const ajax = $.ajax;
+    window.onload = ajaxFunc('전체');
+
+    $('#areaList').change(function() {
+        var area_nm = $('#areaList option:selected').val();
+        console.log('selected:',area_nm);
+
+        clearTable();
+        ajaxFunc(area_nm);
+    })
+
+    // ajax 통신 부분
+    function ajaxFunc(area_nm) {
+        ajax({
+            url: 'adminRequestOrderList',
             type: 'POST',
+            data: {
+                area_nm : area_nm
+            },
             success: function (data) {
-                const result = JSON.parse(data);
-                addSelectOption(result);
-            }
-        })
-
-        // 셀렉트박스 리스트 아이템 붙이기
-        function addSelectOption(data) {
-            const selectItem = document.getElementById('areaList');
-            for(var i=0; i < data.length; i++) {
-                console.log(data[i]);
-                var optionItem = document.createElement('option');
-                optionItem.innerHTML = data[i].area_nm;
-                optionItem.value = data[i].area_nm;
-                selectItem.appendChild(optionItem);
-            }
-        }
-    </script>
-
-    <!-- [운영자] - 휴게소에 들어온 주문내역 DB에 접근해서 Table 형태로 그리기 -->
-    <script>
-        const ajax = $.ajax;
-        window.onload = ajaxFunc('전체');
-
-        $('#areaList').change(function() {
-            var area_nm = $('#areaList option:selected').val();
-            console.log('selected:',area_nm);
-
-            clearTable();
-            ajaxFunc(area_nm);
-        })
-
-        // ajax 통신 부분
-        function ajaxFunc(area_nm) {
-            ajax({
-                url: 'adminRequestOrderList',
-                type: 'POST',
-                data: {
-                    area_nm : area_nm
-                },
-                success: function (data) {
-                    console.log('draw table start!');
-                    if(data.length != 0) {
-                        const jsonData = JSON.parse(data);
-                        drawTable(jsonData);
-                    }
+                console.log('draw table start!');
+                if(data.length != 0) {
+                    const jsonData = JSON.parse(data);
+                    drawTable(jsonData);
                 }
-            })
-        }
+            }
+        })
+    }
 
-        // 이부분은 나중에 주문내역 보이도록 현재는 휴게소 정보로 나오도록 일단 해둠 (수정할 것)
-        function drawTable(data) {
-            const oldChild = document.querySelector('tbody');
-            console.log(oldChild);
-            for (var i = 0; i < data.length; i++) {
-                console.log(data[i]);
-                var tr = document.createElement('tr');
-                var td0 = document.createElement('td');
-                var td1 = document.createElement('td');
-                var td2 = document.createElement('td');
-                var td3 = document.createElement('td');
-                var td4 = document.createElement('td');
-                var td5 = document.createElement('td');
+    // 이부분은 나중에 주문내역 보이도록 현재는 휴게소 정보로 나오도록 일단 해둠 (수정할 것)
+    function drawTable(data) {
+        const oldChild = document.querySelector('tbody');
+        console.log(oldChild);
+        for (var i = 0; i < data.length; i++) {
+            console.log(data[i]);
+            let flag;
+            var tr = document.createElement('tr');
+            var td0 = document.createElement('td');
+            var td1 = document.createElement('td');
+            var td2 = document.createElement('td');
+            var td3 = document.createElement('td');
+            var td4 = document.createElement('td');
+            var td5 = document.createElement('td');
 
-                td0.innerHTML = data[i].order_time;
-                td1.innerHTML = data[i].area_nm;
-                td2.innerHTML = data[i].order_no;
-                td3.innerHTML = data[i].orderer_pn;
-                td4.innerHTML = `<button>세부내용</button>`;    // 눌르면 주문 상세내용 나옴
-                td5.innerHTML = `<button>확인</button>`;        // 눌르면 주문확인 되어 사용자는 결제취소 불가능
+            td0.innerHTML = data[i].order_time;
+            td1.innerHTML = data[i].area_nm;
+            td2.innerHTML = data[i].order_no;
+            td3.innerHTML = data[i].orderer_pn;
+            if(data[i].serving_yn === 'Y') {
+                flag = 'disabled';
+            } else {
+                flag = '';
+            }
+            td4.innerHTML = `<button onclick="showDetail(this)">세부내용</button>`;    // 눌르면 주문 상세내용 나옴
+            td5.innerHTML = `<button onclick="checkOrder(this)" ${flag}>확인</button>`;        // 눌르면 주문확인 되어 사용자는 결제취소 불가능
 
-                tr.appendChild(td0);
-                tr.appendChild(td1);
-                tr.appendChild(td2);
-                tr.appendChild(td3);
-                tr.appendChild(td4);
-                tr.appendChild(td5);
+            tr.appendChild(td0);
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+            tr.appendChild(td5);
 
+            if(data[i].cancel_yn === 'N') {
                 oldChild.appendChild(tr);
             }
         }
+    }
 
-        // 조회조건이 변경되면 테이블 밀어야함
-        function clearTable() {
-            const oldChild = document.querySelector('tbody');
-            // 기존 테이블 내용 삭제
-            while ( oldChild.hasChildNodes() ) { 
-                oldChild.removeChild( oldChild.firstChild );
-            }
+    // 조회조건이 변경되면 테이블 밀어야함
+    function clearTable() {
+        const oldChild = document.querySelector('tbody');
+        // 기존 테이블 내용 삭제
+        while ( oldChild.hasChildNodes() ) { 
+            oldChild.removeChild( oldChild.firstChild );
         }
-    </script>
+    }
 
-</body>
+    // 상세내용 확인 버튼 이벤트
+    function showDetail(btn) {
+        const orderNo = btn.parentNode.parentNode.childNodes[2].innerHTML;
+        openWin(orderNo);
+    }
 
-</html>
+
+    // 주문 확인 버튼 이벤트
+    function checkOrder(btn) {
+        const orderNo = btn.parentNode.parentNode.childNodes[2].innerHTML;
+
+        ajax({
+            url: 'adminUpdateOrderInfo',
+            type: 'POST',
+            data: {
+                order_no: orderNo,
+            },
+            success: function(data) {
+                // console.log(data);
+                btn.disabled = 'true';
+            }
+        });
+    }
+
+    // 상세주문 팝업 
+    function openWin(order_no) {
+        window.open(`./orderDetail?order_no=${order_no}`,"open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
+    }
+</script>

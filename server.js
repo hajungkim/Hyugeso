@@ -261,6 +261,21 @@ app.post("/adminRequestOrderList", function(req, res) {
   })
 })
 
+// admin 에서 휴게소이름에 따라 주문리스트 보여주기
+app.post("/adminUpdateOrderInfo", function(req, res) {
+  const orderNo = req.body.order_no;
+
+  console.log(orderNo);
+
+  // 수정
+  connection.query('UPDATE order_info_tb SET serving_yn = ? WHERE order_no = ?', ['Y', orderNo], function(error, result, fields) {
+    if(error) {
+      throw error;
+    } else {
+      console.log(result);
+    }
+  })
+})
 
 
 
@@ -357,3 +372,41 @@ async function insertOrderList (name, price, phone, items, pay_id, orderNo) {
     }
   });
 }
+
+// 결제 취소 부분
+app.post('/requestPayCancel', function(req, res) {
+  const order_no = req.body.order_no;
+  
+  connection.query('SELECT * FROM order_info_tb WHERE order_no = ?', [order_no], function(error, result, fields) {
+    if(error) {
+      throw error;
+    } else {
+      console.log(result);
+      const price = result[0].total_cost;
+      const receiptID = result[0].pay_id;
+      const ordererNo = result[0].orderer_pn;
+
+      console.log(price, receiptID,ordererNo);
+      // 취소 통신
+      BootpayRest.getAccessToken().then(function (token) {
+        if (token.status === 200) {
+          BootpayRest.cancel(receiptID, price, ordererNo, '주문취소').then(function (response) {
+            // 결제 취소가 완료되었다면
+            if (response.status === 200) {
+              // TODO: 결제 취소에 관련된 로직을 수행하시면 됩니다.
+              connection.query('UPDATE order_info_tb SET cancel_yn = ? WHERE order_no = ?', ['Y', order_no], function(error, result, fiedls) {
+                if(error) {
+                  throw error;
+                } else {
+                  res.send('취소 성공');
+                }
+              })
+            }
+          });
+        }
+      });
+    }
+  })
+
+  
+})

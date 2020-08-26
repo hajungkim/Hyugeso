@@ -68,12 +68,12 @@
     async function getLoadNm() {
         
         //현재위치 받아오는거 막음
-        //const latlng = await getUserPosition();
+        const latlng = await getUserPosition();
 
-        const latlng = {
-            lat : 37.2651139800,
-            lon : 127.4036901000,
-        }
+        // const latlng = {
+        //     lat : 37.7579785400,
+        //     lon : 128.8062290000,
+        // }
 
         // T map 도로명 API
         ajax({
@@ -100,9 +100,6 @@
                     url: '/requestRestAreaLatLong',
                     type: 'POST',
                     async : false,
-                    // data : {
-                    //     road_nm : rName,
-                    // },
                     success: function(data) {
                         const results = JSON.parse(data);
                         var map = drawRestAreaMarker(results);
@@ -124,6 +121,7 @@
     // 휴게소 목록 리스트 그리기
     function drawList(results, currentPos) {
         var iValue = rName.indexOf("고속도로");
+        var flag = false;
         if(iValue != -1)
         {
             rName = rName.substring(0,iValue);
@@ -139,45 +137,60 @@
         const submit = document.createElement('input');
         submit.type = 'submit';
         submit.value = '휴게소 정보';
-        var result_distance = new Array(results.Size);
-
+        var result_distance_y = new Array(results.Size);
+        var result_distance_n = new Array(results.size);
         for(i in results) {
             var restArea_roadName = results[i].road_nm;
             var new_roadName = restArea_roadName.substring(0, restArea_roadName.length-1);
-            if(new_roadName == rName){
-                var distance = {
+            var distance = {
                     lat : results[i].latitude,
                     lon : results[i].longitude,
-                }
-                result_distance[i] = new Array(2);
-                var dis = computeDistance(currentPos, distance);
-                result_distance[i] = [dis,i];
-                results[i].road_nm = restArea_roadName;
+                };
+            var dis = computeDistance(currentPos, distance);
+            result_distance_n[i] = new Array(2);
+            result_distance_n[i] = [dis,i];
+            results[i].road_nm = restArea_roadName;
+            if(new_roadName == rName){
+                flag = true;
+                result_distance_y[i] = new Array(2);
+                result_distance_y[i] = [dis,i];
             }
-            result_distance.sort(sortFunction);
+            result_distance_y.sort(sortFunction);
+            result_distance_n.sort(sortFunction);
             function sortFunction(a,b){
                 return (a[0] < b[0]) ? -1 : 1;
             }
         }
 
         for(var i=0; i<6; i++){
-            var idx = result_distance[i][1];
+            var idx = result_distance_n[i][1];
             const li = document.createElement('li');
             const label = document.createElement('label');
+            if(flag){
+                // 자기가 고속도로에 위치해 있다면 
+                idx =result_distance_y[i][1];
+            }
             label.for = results[idx].area_code;
             label.innerHTML = results[idx].area_nm;
             const input = document.createElement('input');
             input.type = 'radio';
+            
             input.id = results[idx].area_code;
             input.name = 'area_code';
             input.value = results[idx].area_code;
-            label.innerHTML += " 약 " + result_distance[i][0].toFixed(2) + "km";
+            if(flag){
+                label.innerHTML += results[idx].road_nm + " 약 " + result_distance_y[i][0].toFixed(2) + "km";
+            }
+            else{
+                label.innerHTML += results[idx].road_nm + " 약 " + result_distance_n[i][0].toFixed(2) + "km";
+            }
             const br = document.createElement('br');
             li.appendChild(label);
             li.appendChild(input);
             ul.appendChild(li);
             ul.appendChild(br);
         }
+
         ul.appendChild(submit);
   }
     // 지도그리기

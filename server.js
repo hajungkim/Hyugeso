@@ -157,6 +157,7 @@ app.post("/requestOrderList", function (req, res) {
   });
 })
 
+// 주문번호 받아서 주문상세 내역 반환
 app.post("/requestOrderInfo", function (req, res) {
     const order_no = req.body.order_no;
   
@@ -295,3 +296,16 @@ function getOrderCnt(todayDate) {
   });
 }
 
+
+// admin 에서 휴게소이름에 따라 주문리스트 보여주기
+app.post("/adminRequestOrderList", function(req, res) {
+  let area_nm = (req.body.area_nm == '전체' ? '%' : req.body.area_nm);
+  console.log(area_nm);
+  connection.query('SELECT * FROM order_info_tb WHERE area_nm LIKE ?', [area_nm], function(error, result, fields) {
+    if(error) {
+      throw error;
+    } else {
+      res.send(result);
+    }
+  })
+})

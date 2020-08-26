@@ -34,29 +34,32 @@
                 <div class="col">
                     <p class="text-black mt-5 mb-5">Welcome back, <b>Admin</b></p>
                 </div>
+                <!-- 행 내용(row content) 시작 -->
+                <div class="col-12 tm-block-col">
+                    <div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
+                        <div>
+                            <h2 class="tm-block-title">Orders List</h2>
+                            <select class='tm-block-col' id='areaList' style='width:150px;'>
+                                <option value='all' selected='selected'>전체</option>
+                            </select>
+                        </div>
 
-                            <!-- 행 내용(row content) 시작 -->
-            <div class="col-12 tm-block-col">
-                <div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
-                    <h2 class="tm-block-title">Orders List</h2>
-                    <select class='tm-block-col' id='areaCodeList'>
-                        <option value='all' selected='selected'>전체</option>
-                    </select>
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">ORDER TIEM</th>
-                                <th scope="col">ORDER NO</th>
-                                <th scope="col">ORDERER PN</th>
-                                <th scope="col">SERVING</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ORDER TIEM</th>
+                                    <th scope="col">ORDER AREA</th>
+                                    <th scope="col">ORDER NO</th>
+                                    <th scope="col">ORDERER PN</th>
+                                    <th scope="col">DETAIL</th>
+                                    <th scope="col">SERVING</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
             </div>
 
         </div>
@@ -64,8 +67,6 @@
         <!-- 하단 -->
         <footer class="tm-footer row tm-mt-small">
             <div class="col-12 font-weight-light">
-                <p class="text-center text-white mb-0 px-4 small">
-                </p>
             </div>
         </footer>
     </div>
@@ -80,118 +81,11 @@
     <!-- https://getbootstrap.com/ -->
     <script src="js/tooplate-scripts.js"></script>
 
-    <!-- [운영자] - 차트 그리기  -->
-    <script>
-        Chart.defaults.global.defaultFontColor = 'white';
-        let ctxLine,
-            ctxBar,
-            ctxPie,
-            optionsLine,
-            optionsBar,
-            optionsPie,
-            configLine,
-            configBar,
-            configPie,
-            lineChart,
-            barChart,
-            pieChart;
-        // DOM is ready
-        $(function () {
-            drawLineChart(); // Line Chart
-            drawBarChart(); // Bar Chart
-            drawPieChart(); // Pie Chart
-
-            $(window).resize(function () {
-                updateLineChart();
-                updateBarChart();
-            });
-        })
-    </script>
-    
-    <!-- 메뉴API 테스트 (cors 문제로 여기서는 안된다 / 서버에서는 가능) -->
-    <script>
-        $('#btnMenuApi').click(function(){
-        $.ajax({
-            url: 'http://data.ex.co.kr/openapi/restinfo/restBestfoodList',
-            type: 'POST',
-            data: {
-                key: '7027848923',
-                type: 'json',
-            },
-            success: function(data) {
-                console.log(data);
-                $('#MenuApiTextArea').val('data');
-            }
-        })
-    });
-    </script>
-
-
-    <!-- [사용자] - 결제 완료시 주문 내용 데이터 넘기면 - 주문완료/실패 결과 반환해주기 -->
-    <script>
-        $('#btnOrderInfo').click(function(){
-            $.ajax({
-                url: '/insertDBOrderList',
-                type: 'POST',
-                data: {
-                    // 주문번호는 서버에서 만들것
-                    // 음식코드, 휴게소코드, 메뉴분류코드 넘겨주면 됨
-                    orderer_pn : '010-3101-8031' // 주문자 핸드폰 번호 값 넘기면 됨
-                },
-                success: function(data) {
-                    console.log(data);
-                    if(data === 'err') {
-                        $('#OrderInfoTextArea').val('[주문 실패]');
-                    } else {
-                        $('#OrderInfoTextArea').val(`[주문 완료] 주문번호: ${data}`);
-                    }
-                }
-            })
-        });
-    </script>
-
-    <!-- [사용자] - 원하는 휴게소 선택 했을 때, 그 휴게소 정보 넘겨주기 -->
-    <script>
-        $('#btnRestAreaInfo').click(function() {
-            var restarea_code = $('#areaCodeList1 option:selected').val();
-            console.log('휴게소 정보 넘겨받기 click', restarea_code);
-
-            $.ajax({
-                url: '/restAreaInfo',
-                type: 'POST',
-                data: {
-                    restarea_code : restarea_code,
-                },
-                success: function (data) {
-                    const result = JSON.parse(data);
-                    console.log(result);
-                    console.log(data);
-                    
-                    $('#RestAreaInfoTextArea').val(data);
-                    // console.log(result);
-                },
-            });
-        });
-    </script>
-
-    <!-- [사용자] - 휴게소(코드, 이름, 위도, 경도) 받기 -->
-    <script>
-        $('#btnRestAreaLatLongInfo').click(function() {
-            $.ajax({
-                url: '/requestRestAreaLatLong',
-                type: 'POST',
-                success: function(data) {
-                    const result = JSON.parse(data);
-                    $('#RestAreaLatLongTextArea').val(data);
-                }
-            });
-        });
-    </script>
 
     <!-- [운영자] - 휴게소 종류 셀렉트박스 값 -->
     <script>
         $.ajax({
-            url: 'restAreaList',
+            url: 'requestRestAreaLatLong',
             type: 'POST',
             success: function (data) {
                 const result = JSON.parse(data);
@@ -201,22 +95,13 @@
 
         // 셀렉트박스 리스트 아이템 붙이기
         function addSelectOption(data) {
-            const selectItem = document.getElementById('areaCodeList');
-            const selectItem1 = document.getElementById('areaCodeList1');
+            const selectItem = document.getElementById('areaList');
             for(var i=0; i < data.length; i++) {
                 console.log(data[i]);
                 var optionItem = document.createElement('option');
                 optionItem.innerHTML = data[i].area_nm;
-                optionItem.value = data[i].area_code;
+                optionItem.value = data[i].area_nm;
                 selectItem.appendChild(optionItem);
-            }
-
-            for(var i=0; i < data.length; i++) {
-                console.log(data[i]);
-                var optionItem = document.createElement('option');
-                optionItem.innerHTML = data[i].area_nm;
-                optionItem.value = data[i].area_code;
-                selectItem1.appendChild(optionItem);
             }
         }
     </script>
@@ -225,21 +110,21 @@
     <script>
         window.onload = ajaxFunc('all');
 
-        $('#areaCodeList').change(function() {
-            var restarea_code = $('#areaCodeList option:selected').val();
-            console.log(restarea_code);
+        $('#areaList').change(function() {
+            var area_nm = $('#areaList option:selected').val();
+            console.log(area_nm);
 
             clearTable();
-            ajaxFunc(restarea_code);
+            ajaxFunc(area_nm);
         })
 
         // ajax 통신 부분
-        function ajaxFunc(restarea_code) {
+        function ajaxFunc(area_nm) {
             $.ajax({
-                url: '/orderList',
+                url: 'adminRequestOrderList',
                 type: 'POST',
                 data: {
-                    restarea_code : restarea_code
+                    area_nm : area_nm
                 },
                 success: function (data) {
                     console.log('draw table start!');
@@ -262,17 +147,13 @@
                 var td3 = document.createElement('td');
                 var td4 = document.createElement('td');
                 var td5 = document.createElement('td');
-                var td6 = document.createElement('td');
-                var td7 = document.createElement('td');
 
-                td0.innerHTML = data[i].area_code;
+                td0.innerHTML = data[i].order_tiem;
                 td1.innerHTML = data[i].area_nm;
-                td2.innerHTML = data[i].road_type;
-                td3.innerHTML = data[i].road_no;
-                td4.innerHTML = data[i].road_nm;
-                td5.innerHTML = data[i].road_way;
-                td6.innerHTML = data[i].latitude;
-                td7.innerHTML = data[i].longitude;
+                td2.innerHTML = data[i].order_no;
+                td3.innerHTML = data[i].orderer_pn;
+                td4.innerHTML = 'button';
+                td5.innerHTML = 'button';
 
                 tr.appendChild(td0);
                 tr.appendChild(td1);
@@ -280,8 +161,6 @@
                 tr.appendChild(td3);
                 tr.appendChild(td4);
                 tr.appendChild(td5);
-                tr.appendChild(td6);
-                tr.appendChild(td7);
 
                 oldChild.appendChild(tr);
             }

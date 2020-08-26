@@ -19,14 +19,12 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
                     <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
                 </ul>
             </div>
@@ -43,16 +41,16 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-3">
-                            <div class="panel panel-info">
+                            <div class="panel panel-default">
                                 <div id='orderDate' class="panel-heading"></div>
                                     <div class="panel-body">
-                                        <form id="info" methon="post" action="orderDetail" target="open">
-                                            <input type="hidden" name="order_no" value=${order_no}>
-                                            <h4 id='orderArea'></h4>
-                                            <h4 id='orderNumber'></h4>
-                                            <h4><small><span>총 결제 금액 : </span><span id='totalPrice'></span>원</small></h4>
-                                            <br>
-                                        </form>
+                                        <input type="hidden" name="order_no" value=${order_no}>
+                                        <h4 id='orderArea'></h4>
+                                        <h4 id='orderNumber'></h4>
+                                        <h4><small><span>총 결제 금액 : </span><span id='totalPrice'></span>원</small></h4>
+                                        <button onClick='openWin()' class="btn btn-info">주문상세</button>
+                                        <button onClick='cancelOrder()' class="btn btn-danger">주문취소</button>
+                                        <br>
                                     </div>
                                 </div>
                             </div>
@@ -75,14 +73,17 @@
 </html>
 
 <script>
-    
     const qs = getQueryStringObject();
+    const ajax = $.ajax;
+
     console.log(qs);
     const orderArea = qs.area_nm;
     const orderNumber = qs.order_no;
     const totalPrice = qs.total_cost;
     const tempDate = orderNumber.substr(2,8);
     const orderDate = tempDate.slice(0,4) + '-' + tempDate.slice(4,6) + '-' + tempDate.slice(6);
+
+    console.log(orderNumber);
 
     document.getElementById('orderDate').innerHTML = orderDate;
     document.getElementById('orderArea').innerHTML = orderArea;
@@ -110,5 +111,32 @@
 
     function moveOrderList() {
         window.location.href = '/orderList';
+    }
+
+    // 상세주문 팝업 
+    function openWin() {
+        console.log(orderNumber);
+        window.open(`/orderDetail?order_no=${orderNumber}`,"open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
+    }
+
+    // 주문취소 프로세스
+    function cancelOrder() {
+        console.log(orderNumber);
+        if(confirm('주문을 취소하시겠습니까?') == true) {
+            ajax({
+            url: 'requestPayCancel',
+            type: 'POST',
+            data: {
+                order_no: orderNumber,
+            },
+            success: function(data) {
+                console.log(data);
+                alert('취소되었습니다.');
+                location.reload();
+            }   
+        })
+        } else {
+            return false;
+        }
     }
 </script>

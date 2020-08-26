@@ -18,14 +18,12 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
                     <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
                 </ul>
             </div>
@@ -47,7 +45,7 @@
     </div>
     <br>
     <div style="text-align: center;">
-        <h4><i class="fas fa-map-marker-alt" style="font-size:25px"></i> 근처 휴게소 목록</h4>
+        <h4><i class="fas fa-map-marker-alt" style="font-size:25px"><span id="roadNm"></span></i> 근처 휴게소 목록</h4>
     </div>
 
     <div class="list-group" id='restareaList' style="margin:20px">
@@ -101,11 +99,13 @@
 
     // 현재 위치의 도로명 받아오기
     async function getLoadNm() {
-        //현재위치 받아오는거 막음
-        //const latlng = await getUserPosition();
+        // 현재위치 받기
+        // const latlng = await getUserPosition();
+        
+        // TEST 위치 - 영동고속도로 , 중부고속도로 사이
         const latlng = {
-            lat : 37.2651139800,
-            lon : 127.4036901000,
+            lat : 37.244542,
+            lon : 127.359095,
         }
 
         // T map 도로명 API
@@ -128,6 +128,7 @@
                 
                 rName = resultHeader.roadName;
                 console.log("rName : ",rName);
+                document.getElementById('roadNm').innerHTML = rName;
 
                 ajax({
                     url: '/requestRestAreaLatLong',

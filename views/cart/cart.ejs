@@ -19,14 +19,12 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
                     <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
                 </ul>
             </div>
@@ -167,24 +165,31 @@
 
             // 전화번호 입력시 숫자만 & 11자리 입력 예외처리
             var phone_no;
+            var formatted_phone_no;
+
             while(1) {
                 phone_no = prompt('핸드폰번호 입력');
-                var reg = /^[0-9]*$/;
-                if(!reg.test(phone_no)) {
-                    alert('숫자만 입력하세요')
+                if(phone_no == null) {
+                    // 번호 입력 안하고 취소
+                    break;
                 } else {
-                    if(phone_no.length != 11) {
-                    alert('핸드폰번호 11자리를 입력해주세요.');
+                    // 번호 입력 후 확인
+                    var reg = /^[0-9]*$/;
+                    if(!reg.test(phone_no)) {
+                        alert('숫자만 입력하세요')
                     } else {
-                        break;
+                        if(phone_no.length != 11) { 
+                            alert('핸드폰번호 11자리를 입력해주세요.');
+                        } else {
+                            // 받은 전화번호 포맷팅
+                            formatted_phone_no = phone_no.slice(0, 3) + "-" + phone_no.slice(3, 7) + "-" + phone_no.slice(7);
+                            break;
+                        }
                     }
                 }
             }
 
-            // 받은 전화번호 포맷팅
-            var formatted_phone_no = phone_no.slice(0, 3) + "-" + phone_no.slice(3, 7) + "-" + phone_no.slice(7);
             let order_no;
-
             let totalPrice = 0;
             let orderList = [];
             let orderListCnt = document.getElementsByName("menuCheckBox").length;

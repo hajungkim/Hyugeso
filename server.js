@@ -55,6 +55,12 @@ app.get("/cart", function (request, response) {
   response.render("cart/cart");
 });
 
+// 결제완료시 주문완료 화면
+app.get("/cartOk", function (request, response) {
+  response.render("cart/cartOk");
+});
+
+
 //주문했었던 목록 화면(주문번호, 주문내역 확인)
 app.get("/orderlist", function (request, response) {
   response.render("orderlist/orderlist");

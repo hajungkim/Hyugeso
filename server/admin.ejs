@@ -13,10 +13,7 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <!-- https://getbootstrap.com/ -->
     <link rel="stylesheet" href="css/templatemo-style.css">
-    <!--
-	Product Admin CSS Template
-	https://templatemo.com/tm-524-product-admin
-	-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
 <body id="reportsPage">
@@ -24,77 +21,10 @@
         <!-- 상단(타이틀,네비게이터) -->
         <nav class="navbar navbar-expand-xl">
             <div class="container h-100">
-                <a class="navbar-brand" href="/">
+                <a class="navbar-brand" href="/admin">
                     <h1 class="tm-site-title mb-0">Product Admin</h1>
                 </a>
-
-                <!-- <button class="navbar-toggler ml-auto mr-0" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fas fa-bars tm-nav-icon"></i>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mx-auto h-100">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">
-                                <i class="fas fa-tachometer-alt"></i>
-                                Dashboard
-                                <span class="sr-only">(current)</span>
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <i class="far fa-file-alt"></i>
-                                <span>
-                                    Reports <i class="fas fa-angle-down"></i>
-                                </span>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="#">Daily Report</a>
-                                <a class="dropdown-item" href="#">Weekly Report</a>
-                                <a class="dropdown-item" href="#">Yearly Report</a>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="products.html">
-                                <i class="fas fa-shopping-cart"></i>
-                                Products
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="accounts.html">
-                                <i class="far fa-user"></i>
-                                Accounts
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-cog"></i>
-                                <span>
-                                    Settings <i class="fas fa-angle-down"></i>
-                                </span>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="#">Profile</a>
-                                <a class="dropdown-item" href="#">Billing</a>
-                                <a class="dropdown-item" href="#">Customize</a>
-                            </div>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link d-block" href="login.html">
-                                Admin, <b>Logout</b>
-                            </a>
-                        </li>
-                    </ul>
-                </div> -->
             </div>
-
         </nav>
 
         <!-- 중단(내용) -->
@@ -102,11 +32,10 @@
             <!-- 행(row) 시작 -->
             <div class="row">
                 <div class="col">
-                    <p class="text-white mt-5 mb-5">Welcome back, <b>Admin</b></p>
+                    <p class="text-black mt-5 mb-5">Welcome back, <b>Admin</b></p>
                 </div>
-            </div>
 
-            <!-- 행 내용(row content) 시작 -->
+                            <!-- 행 내용(row content) 시작 -->
             <div class="col-12 tm-block-col">
                 <div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
                     <h2 class="tm-block-title">Orders List</h2>
@@ -117,79 +46,25 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">RESTAREA CODE</th>
-                                <th scope="col">RESTAREA NAME</th>
-                                <th scope="col">ROAD TYPE</th>
-                                <th scope="col">ROAD NO</th>
-                                <th scope="col">ROAD NAME</th>
-                                <th scope="col">ROAD WAY</th>
-                                <th scope="col">LATITUDE</th>
-                                <th scope="col">LONGITUDE</th>
+                                <th scope="col">ORDER TIEM</th>
+                                <th scope="col">ORDER NO</th>
+                                <th scope="col">ORDERER PN</th>
+                                <th scope="col">SERVING</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
                     </table>
-
                 </div>
             </div>
-
-            <!-- ajax 테스트  -->
-            <div class="colTest">
-                <select class='selectTest' id='areaCodeList1'></select>
-                <button class="btnTest" id='btnRestAreaInfo'>휴게소 정보 넘겨받기 TEST</button>
-                <textarea class='textTest' id='RestAreaInfoTextArea'></textarea>
             </div>
 
-            <div class="colTest">
-                <button class="btnTest" id='btnOrderInfo'>주문내역 넘겨서 DB넣기 TEST</button>
-                <textarea class='textTest' id='OrderInfoTextArea'></textarea>
-            </div>
-
-            <div class="colTest">
-                <button class="btnTest" id='btnRestAreaLatLongInfo'>휴게소 위치정보 넘겨받기 TEST</button>
-                <textarea class='textTest' id='RestAreaLatLongTextArea'></textarea>
-            </div>
-
-            <div class="colTest">
-                <button class="btnTest" id='btnMenuApi'>메뉴 API TEST</button>
-                <textarea class='textTest' id='MenuApiTextArea'></textarea>
-            </div>
-            <!-- 차트  -->
-            <!-- <div class="row tm-content-row">
-                <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
-                    <div class="tm-bg-primary-dark tm-block">
-                        <h2 class="tm-block-title"></h2>
-                        <canvas id="lineChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
-                    <div class="tm-bg-primary-dark tm-block">
-                        <h2 class="tm-block-title"></h2>
-                        <canvas id="barChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
-                    <div class="tm-bg-primary-dark tm-block tm-block-taller">
-                        <h2 class="tm-block-title"></h2>
-                        <div id="pieChartContainer">
-                            <canvas id="pieChart" class="chartjs-render-monitor" width="200" height="200"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
 
         <!-- 하단 -->
         <footer class="tm-footer row tm-mt-small">
             <div class="col-12 font-weight-light">
                 <p class="text-center text-white mb-0 px-4 small">
-                    Copyright &copy; <b>2018</b> All rights reserved.
-
-                    Design: <a rel="nofollow noopener" href="https://templatemo.com" class="tm-footer-link">Template
-                        Mo</a>
                 </p>
             </div>
         </footer>

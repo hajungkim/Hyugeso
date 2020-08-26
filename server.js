@@ -31,6 +31,11 @@ app.use(expressLayouts);
 app.use(express.static(__dirname));
 
 // 홈 화면
+app.get("/admin", function (req, res) {
+  res.render("../server/admin");
+});
+
+// 홈 화면
 app.get("/home", function (req, res) {
   res.render("home");
 });
@@ -75,6 +80,15 @@ app.get("/orderDetail", function (req, res) {
 app.listen(3000, function () {
   console.log("example app listening at http://localhost:3000");
 });
+
+// // 서버 Start
+// app.listen(3001, function () {
+//   console.log("example app listening at http://localhost:3001");
+// });
+
+
+
+
 
 // 사용자 앱에서 휴게서 위도,경도 요청시 값 보내주기 - 홈 화면(지도, 리스트)
 app.post("/requestRestAreaLatLong", function (req, res) {
@@ -154,7 +168,6 @@ app.post("/requestOrderInfo", function (req, res) {
       }
     });
   })
-
 
 // 메뉴API(공공데이터) 사용해서 메뉴 가져오기
 getMenuInfo = async (areaName) => {
@@ -281,3 +294,4 @@ function getOrderCnt(todayDate) {
     });
   });
 }
+

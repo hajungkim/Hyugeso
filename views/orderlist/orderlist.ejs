@@ -91,9 +91,18 @@
             const area_nm = data[i].area_nm;
             const order_no = data[i].order_no;
             const total_cost = data[i].total_cost;
+            const pay_id = data[i].pay_id;
+            const serving_yn = data[i].serving_yn;
+            let flag = 'false';
 
             let order_date = order_no.substr(2,8);
             var formatted = order_date.slice(0, 4) + "-" + order_date.slice(4, 6) + "-" + order_date.slice(6);
+
+            console.log(serving_yn);
+            if(serving_yn == 'Y') {
+                console.log('serving ok');
+                flag = 'true';
+            }
 
             console.log(i);
             const items= `
@@ -108,6 +117,7 @@
                                     <h4><small><span>총 결제 금액 : </span><span>${total_cost}</span>원</small></h4>
                                     <br>
                                     <button onClick='openWin()' class="btn btn-info">주문상세</button>
+                                    <button onClick='cancelOrder()' class="btn btn-danger" disabled="${flag}">주문취소</button>
                                 </form>
                             </div>
                         </div>
@@ -126,4 +136,10 @@
         window.open("./orderDetail","open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
         $("#info").submit();
     }
+
+    // 주문취소 프로세스
+    function cancelOrder() {
+        alert('주문취소 프로세스 진행 해야함');
+    }
+
 </script>

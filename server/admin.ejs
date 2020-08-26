@@ -108,11 +108,12 @@
 
     <!-- [운영자] - 휴게소에 들어온 주문내역 DB에 접근해서 Table 형태로 그리기 -->
     <script>
-        window.onload = ajaxFunc('all');
+        const ajax = $.ajax;
+        window.onload = ajaxFunc('전체');
 
         $('#areaList').change(function() {
             var area_nm = $('#areaList option:selected').val();
-            console.log(area_nm);
+            console.log('selected:',area_nm);
 
             clearTable();
             ajaxFunc(area_nm);
@@ -120,7 +121,7 @@
 
         // ajax 통신 부분
         function ajaxFunc(area_nm) {
-            $.ajax({
+            ajax({
                 url: 'adminRequestOrderList',
                 type: 'POST',
                 data: {
@@ -128,8 +129,10 @@
                 },
                 success: function (data) {
                     console.log('draw table start!');
-                    const jsonData = JSON.parse(data);
-                    drawTable(jsonData);
+                    if(data.length != 0) {
+                        const jsonData = JSON.parse(data);
+                        drawTable(jsonData);
+                    }
                 }
             })
         }
@@ -148,12 +151,12 @@
                 var td4 = document.createElement('td');
                 var td5 = document.createElement('td');
 
-                td0.innerHTML = data[i].order_tiem;
+                td0.innerHTML = data[i].order_time;
                 td1.innerHTML = data[i].area_nm;
                 td2.innerHTML = data[i].order_no;
                 td3.innerHTML = data[i].orderer_pn;
-                td4.innerHTML = 'button';
-                td5.innerHTML = 'button';
+                td4.innerHTML = `<button>세부내용</button>`;    // 눌르면 주문 상세내용 나옴
+                td5.innerHTML = `<button>확인</button>`;        // 눌르면 주문확인 되어 사용자는 결제취소 불가능
 
                 tr.appendChild(td0);
                 tr.appendChild(td1);

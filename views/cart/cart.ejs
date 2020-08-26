@@ -52,13 +52,6 @@
     //     console.log(localStorage.key(i))
     // }
 
-    if(localStorage) {
-        alert('장바구니에 상품을 추가해주세요.');
-        // window.location.href = '/menulist';
-    }
-
-
-
     const qs = getQueryStringObject();
     let area_nm = qs.area_nm;
 
@@ -232,6 +225,7 @@
                         data: {
                             area_nm: area_nm, // 휴게소 이름
                             total_cost: totalPrice, // 총 가격 
+                            pay_id: 'test',
                             phone_no: formatted_phone_no, // 주문자 번호 - 입력받은 핸드폰 번호 넣어주어야함
                             lists: JSON.stringify(orderList), // 주문 내역
                         },

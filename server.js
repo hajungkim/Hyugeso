@@ -10,6 +10,7 @@ const connection = mysql.createConnection({
   user: "root",
   password: "12qw!@QW",
   database: "test",
+  dateStrings: "date",
 });
 
 // views
@@ -191,6 +192,7 @@ app.post("/insertOrderList", async function (req, res) {
   const phoneNo = req.body.phone_no;
   const totalCost = req.body.total_cost;
   const areaNm = req.body.area_nm;
+  const payId = req.body.pay_id;
   const lists = req.body.lists;
   const jsonData = JSON.parse(lists);
 
@@ -200,11 +202,15 @@ app.post("/insertOrderList", async function (req, res) {
 
   console.log(phoneNo);
 
+
   const SQL1 = {
     order_no: order_no,
+    orderer_pn: phoneNo,
+    pay_id: payId,
     area_nm: areaNm,
     total_cost: totalCost,
-    orderer_pn: phoneNo,
+    serving_yn: 'N',
+    cancel_yn: 'N'
   };
   // 주문정보 INSERT
   connection.query("INSERT INTO order_info_tb SET ? ", SQL1, function (error, result, fields) {
@@ -305,7 +311,8 @@ app.post("/adminRequestOrderList", function(req, res) {
     if(error) {
       throw error;
     } else {
-      res.send(result);
+      console.log(result);
+      res.send(JSON.stringify(result));
     }
   })
 })

@@ -2,51 +2,64 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <title>휴게소 바로 주문</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
 </head>
 <script src="https://cdn.bootpay.co.kr/js/bootpay-3.2.6.min.js" type="application/javascript"></script>
 
 <body>
-    <!-- 장바구니 -->
-    <div class="tab-pane" id="cart">
-        <div class="container">
-            <div class="page-header">
-                <h3>장바구니</h3>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
             </div>
-            <div class="well">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xs-9">
-                            <h3>총 상품 가격</h3>
-                        </div>
-                        <div class="col-xs-3">
-                            <h3><small><span id="totalPrice"></span>원</small></h3>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <div class="container">
-                    <button class="btn btn-success" id="payBtn">
-                        <span class="glyphicon glyphicon-ok"></span> 결제하기
-                    </button>
-                    <button class="btn btn-danger" id="removeBtn">
-                        <span class="glyphicon glyphicon-remove"></span> 삭제하기
-                    </button>
-                </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                    <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+<!-- 장바구니 -->
+<div class="tab-pane" id="cart">
+    <div class="container">
+        <div class="page-header">
+            <h3>장바구니</h3>
+        </div>
+        <div class="well">
+            <div class="row" style="text-align:right; margin-right: 10px">
+                <h4>총 상품 가격<span id="totalPrice" style="padding-left:20px; padding-right:10px"></span>원</h4>
+            </div>
+            <hr>
+            <div class="row" style="text-align:right; margin-right: 10px">
+                <button class="btn btn-success" id="payBtn">
+                    <span class="glyphicon glyphicon-ok"></span> 결제하기
+                </button>
+                <button class="btn btn-danger" id="removeBtn">
+                    <span class="glyphicon glyphicon-remove"></span> 삭제하기
+                </button>
             </div>
         </div>
     </div>
+</div>
 </body>
 
 </html>
 
 <script>
-
     // 메뉴 안고르고 카트로 올 경우 예외처리
     // for(var i=0; i<localStorage.length; i++) {
     //     console.log(localStorage.key(i))
@@ -71,7 +84,7 @@
         for (item of cartItems) {
             $(".well").prepend(
                 `<div class="panel-group" id="${item.unique}panel">
-                <div class="panel panel-primary">
+                <div class="panel panel-default">
                     <div class="panel-heading">
                         <input type="checkbox" id="${item.unique}checkBox" value="${item.unique}" name="menuCheckBox"/>
                         <span id="${item.unique}name">
@@ -88,7 +101,7 @@
                                 </thead>
                                 <tbody>
                                     <td>
-                                        <span id="${item.unique}price">${item.price}</span>
+                                        <span id="${item.unique}price">${item.price}원</span>
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-default btn-xs" id="${item.unique}minusBtn">
@@ -152,7 +165,23 @@
         // 결제하기
         $("#payBtn").click(() => {
 
-            var phone_no = prompt('핸드폰번호 입력');
+            // 전화번호 입력시 숫자만 & 11자리 입력 예외처리
+            var phone_no;
+            while(1) {
+                phone_no = prompt('핸드폰번호 입력');
+                var reg = /^[0-9]*$/;
+                if(!reg.test(phone_no)) {
+                    alert('숫자만 입력하세요')
+                } else {
+                    if(phone_no.length != 11) {
+                    alert('핸드폰번호 11자리를 입력해주세요.');
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            // 받은 전화번호 포맷팅
             var formatted_phone_no = phone_no.slice(0, 3) + "-" + phone_no.slice(3, 7) + "-" + phone_no.slice(7);
             let order_no;
 

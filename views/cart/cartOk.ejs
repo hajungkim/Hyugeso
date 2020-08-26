@@ -2,16 +2,37 @@
 <html lang="en">
 
 <head>
+    <title>휴게소 바로 주문</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
 </head>
 <script src="https://cdn.bootpay.co.kr/js/bootpay-3.2.6.min.js" type="application/javascript"></script>
 
 <body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                    <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <!-- 장바구니 -->
     <div class="tab-pane" id="cart">
         <div class="container">
@@ -39,12 +60,12 @@
                     </div>
                 </div>
                 <hr>
-                <div class="container">
-                    <button class="btn btn-success" onclick="moveHome()">
-                        <span></span> Home
+                <div style="text-align:center">
+                    <button class="btn btn-info" onclick="moveHome()">
+                        <span></span> 홈으로 가기
                     </button>
-                    <button class="btn btn-success" onclick="moveOrderList()">
-                        <span></span> OrderList
+                    <button class="btn btn-info" onclick="moveOrderList()">
+                        <span></span> 주문내역 확인하기
                     </button>
                 </div>
             </div>

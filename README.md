@@ -8,4 +8,10 @@ npm install mysql
 
 npm install axios
 
-npm install express-ejs-layouts
+npm install bootpay-js
+
+npm install bootpay-rest-client
+
+
+# 설치 명령어
+npm install express ejs mysql axios bootpay-js bootpay-rest-client

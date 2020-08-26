@@ -5,6 +5,8 @@
   "main": "server.js",
   "dependencies": {
     "axios": "^0.20.0",
+    "bootpay-js": "^3.2.6",
+    "bootpay-rest-client": "^2.0.3",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",

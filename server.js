@@ -2,6 +2,7 @@ const express = require("express");
 const mysql = require("mysql");
 const axios = require("axios");
 const app = express();
+const BootpayRest = require('bootpay-rest-client');
 var expressLayouts = require("express-ejs-layouts");
 
 // DB connection
@@ -12,6 +13,13 @@ const connection = mysql.createConnection({
   database: "test",
   dateStrings: "date",
 });
+
+// BootPay set
+BootpayRest.setConfig(
+	'5f34ea102fa5c20025eecac3',
+	'QIE0I0o851JbjihaAoLetULpoWWKJ962pKcUfLC73No='
+);
+
 
 // views
 app.set("views", __dirname + "/views");
@@ -161,7 +169,7 @@ app.post("/requestOrderList", function (req, res) {
 // 주문번호 받아서 주문상세 내역 반환
 app.post("/requestOrderInfo", function (req, res) {
     const order_no = req.body.order_no;
-  
+    
     connection.query('SELECT * FROM order_food_info_tb WHERE order_no = ?', [order_no], function(error, result, fields) {
       if(error) { 
         throw error;
@@ -185,70 +193,6 @@ getMenuInfo = async (areaName) => {
   // console.log(res.data.list);
   return res.data.list;
 };
-
-// 결제완료시 음식 주문내역 DB에 삽입
-app.post("/insertOrderList", async function (req, res) {
-  console.log(req.body);
-  const phoneNo = req.body.phone_no;
-  const totalCost = req.body.total_cost;
-  const areaNm = req.body.area_nm;
-  const payId = req.body.pay_id;
-  const lists = req.body.lists;
-  const jsonData = JSON.parse(lists);
-
-  console.log("orderNo start");
-  const order_no = await getOrderNo();
-  console.log("orderNo end");
-
-  console.log(phoneNo);
-
-
-  const SQL1 = {
-    order_no: order_no,
-    orderer_pn: phoneNo,
-    pay_id: payId,
-    area_nm: areaNm,
-    total_cost: totalCost,
-    serving_yn: 'N',
-    cancel_yn: 'N'
-  };
-  // 주문정보 INSERT
-  connection.query("INSERT INTO order_info_tb SET ? ", SQL1, function (error, result, fields) {
-    if (error) {
-      console.log("[ERR] 주문정보 ISNERT 실패");
-      throw error;
-    } else {
-      console.log("[OK] 주문정보 INSERT");
-
-      // 음식 리스트 INSERT
-      for (i in jsonData) {
-        console.log(jsonData[i]);
-        const name = jsonData[i].item_name;
-        const cnt = jsonData[i].qty;
-        const price = jsonData[i].price;
-
-        const SQL2 = {
-          order_no: order_no,
-          food_nm: name,
-          food_cnt: cnt,
-          food_price: price,
-          total_price: price * cnt,
-        };
-
-        connection.query("INSERT INTO order_food_info_tb SET ?", SQL2, function (error, result, fields) {
-          if (error) {
-            console.log("[ERR] 음식정보 ISNERT 실패");
-            throw error;
-          } else {
-            console.log("[OK] 음식정보 INSERT 성공");
-          }
-        });
-      }
-    }
-    // 주문정보, 음식주문정보 테이블에 다 넣으면 주문번호 반환
-    res.send(order_no);
-  });
-});
 
 // 주문번호 만들기
 async function getOrderNo() {
@@ -316,3 +260,100 @@ app.post("/adminRequestOrderList", function(req, res) {
     }
   })
 })
+
+
+
+
+
+
+
+// 클라이언트에서 결제 요청
+app.post('/requestPayment', async function(req, res) {
+  const name = req.body.name;
+  const price = req.body.price;
+  const phone = req.body.phone;
+  const items = JSON.parse(req.body.items);
+  const receiptId = req.body.receipt_id;
+
+  console.log("orderNo start");
+  const orderNo = await getOrderNo();
+  console.log("orderNo end");
+  
+  BootpayRest.getAccessToken().then(function (response) {
+    // Access Token을 발급 받았을 때
+    if (response.status === 200 && response.data.token !== undefined) {
+      BootpayRest.verify(receiptId).then(function (_response) {
+        // 검증 결과를 제대로 가져왔을 때
+        if (_response.status === 200) {
+          // console.log(_response);
+          console.log(_response.status);
+          
+          // DB에 삽입
+          insertOrderList(name, price, phone, items, receiptId, orderNo);
+
+          const result = {
+            receipt_id: _response.data.receipt_id,
+            code: _response.status,
+            order_no: orderNo,
+          }
+          console.log(result);
+          res.send(result);
+        }
+      });
+    }
+  });
+})
+
+// 주문 확인시 주문테이블에 삽입
+async function insertOrderList (name, price, phone, items, pay_id, orderNo) {
+  const totalCost = price;
+  const areaNm = name;
+  const payId = pay_id;
+  const phoneNo = phone;
+  const jsonData = items;
+
+  // 결제가 완료되면 DB에 INSERT
+  const SQL1 = {
+    order_no: orderNo,
+    orderer_pn: phoneNo,
+    pay_id: payId,
+    area_nm: areaNm,
+    total_cost: totalCost,
+    serving_yn: 'N',
+    cancel_yn: 'N'
+  };
+  // 주문정보 INSERT
+  connection.query("INSERT INTO order_info_tb SET ? ", SQL1, function (error, result, fields) {
+    if (error) {
+      console.log("[ERR] 주문정보 ISNERT 실패");
+      throw error;
+    } else {
+      console.log("[OK] 주문정보 INSERT");
+
+      // 음식 리스트 INSERT
+      for (i in jsonData) {
+        console.log(jsonData[i]);
+        const name = jsonData[i].item_name;
+        const cnt = jsonData[i].qty;
+        const price = jsonData[i].price;
+
+        const SQL2 = {
+          order_no: orderNo,
+          food_nm: name,
+          food_cnt: cnt,
+          food_price: price,
+          total_price: price * cnt,
+        };
+
+        connection.query("INSERT INTO order_food_info_tb SET ?", SQL2, function (error, result, fields) {
+          if (error) {
+            console.log("[ERR] 음식정보 ISNERT 실패");
+            throw error;
+          } else {
+            console.log("[OK] 음식정보 INSERT 성공");
+          }
+        });
+      }
+    }
+  });
+}

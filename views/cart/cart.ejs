@@ -154,6 +154,7 @@
 
             var phone_no = prompt('핸드폰번호 입력');
             var formatted_phone_no = phone_no.slice(0, 3) + "-" + phone_no.slice(3, 7) + "-" + phone_no.slice(7);
+            let order_no;
 
             let totalPrice = 0;
             let orderList = [];
@@ -185,7 +186,7 @@
                     user_info: {
                         phone: formatted_phone_no // 사용자 핸드폰 번호 입력 받아야함 
                     },
-                    order_id: '고유order_id_1234', //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
+                    order_id: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
                 })
                 .error(function (data) {
                     //결제 진행시 에러가 발생하면 수행됩니다.
@@ -202,39 +203,44 @@
                 .confirm(function (data) {
                     //결제가 실행되기 전에 수행되며, 주로 재고를 확인하는 로직이 들어갑니다.
                     //주의 - 카드 수기결제일 경우 이 부분이 실행되지 않습니다.
-                    console.log(data)
-                    var enable = true // 재고 수량 관리 로직 혹은 다른 처리
-                    if (enable) {
-                        BootPay.transactionConfirm(data) // 조건이 맞으면 승인 처리를 한다.
-                    } else {
-                        BootPay.removePaymentWindow() // 조건이 맞지 않으면 결제 창을 닫고 결제를 승인하지 않는다.
-                    }
+                    const pay_id = data.receipt_id;
+
+                    console.log('결제요청',data);
+                    // 서버로 결제 검증
+                    ajax({
+                        url: 'requestPayment',
+                        type: 'POST',
+                        data: {
+                            name: area_nm,
+                            price: totalPrice,
+                            items: JSON.stringify(orderList),
+                            phone: formatted_phone_no,
+                            receipt_id: pay_id,
+                        },
+                        success: function(data) {
+                            console.log('서버에서 응답 옴');
+                            console.log('2',data);
+                            order_no = data.order_no;
+                            
+                            if (data.code == 200) {
+                                console.log('성공');
+                                BootPay.transactionConfirm(data) // 조건이 맞으면 승인 처리를 한다.
+                            } else {
+                                console.log('실패');
+                                BootPay.removePaymentWindow() // 조건이 맞지 않으면 결제 창을 닫고 결제를 승인하지 않는다.
+                            }
+                        }
+                    });
                 })
                 .close(function (data) {
                     // 결제창이 닫힐때 수행됩니다. (성공,실패,취소에 상관없이 모두 수행됨)
-                    console.log(data)
+                    console.log('결제창닫기',data)
                 })
                 .done(function (data) {
                     //결제가 정상적으로 완료되면 수행됩니다
                     //비즈니스 로직을 수행하기 전에 결제 유효성 검증을 하시길 추천합니다.
-
-                    // 결제 완료된 데이터 서버로 넘기기
-                    ajax({
-                        url: '/insertOrderList',
-                        type: 'POST',
-                        data: {
-                            area_nm: area_nm, // 휴게소 이름
-                            total_cost: totalPrice, // 총 가격 
-                            pay_id: 'test',
-                            phone_no: formatted_phone_no, // 주문자 번호 - 입력받은 핸드폰 번호 넣어주어야함
-                            lists: JSON.stringify(orderList), // 주문 내역
-                        },
-                        success: function (data) {
-                            // 결제완료시 주문번호 리턴
-                            console.log(data);
-                            window.location.href = `/cartOk?order_no=${data}&area_nm=${area_nm}&total_cost=${totalPrice}`
-                        }
-                    });
+                    console.log('결제완료',data);
+                    window.location.href = `/cartOk?order_no=${order_no}&area_nm=${data.item_name}&total_cost=${data.amount}`
                 })
         });
 
@@ -270,22 +276,3 @@
         return b;
     }
 </script>
-<!--
-    $("#removeBtn").click(() => {
-        let checkedMenu = $("input:checked");
-        if (checkedMenu) {
-            $('input:checked').each(() => {
-                let index = items.findIndex((value, index, array) => {
-                    return value.unique === $('input:checked').val();
-                }) 
-                console.log(index)
-                totalPrice = parseInt(totalPrice) - (items[index].qty * items[index].price)
-            console.log(items.pop(index));
-            //   let removedPrice = document.getElementById("" + unique + "").innerHTML;
-            //   totalPrice -= removedPrice
-        })
-        $('input:checked').parentsUntil('.panel-group').remove() // 장바구니 삭제
-        $(`#totalPrice`).text(totalPrice) // 삽입
-    }
-});
--->

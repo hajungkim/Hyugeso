@@ -20,7 +20,6 @@ BootpayRest.setConfig(
 	'QIE0I0o851JbjihaAoLetULpoWWKJ962pKcUfLC73No='
 );
 
-
 // views
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
@@ -32,9 +31,6 @@ app.use(
     extended: false,
   })
 );
-
-//layout
-app.use(expressLayouts);
 
 // 이 과정을 거쳐야 내부폴더에 있는 파일을 접근할 수 있음
 app.use(express.static(__dirname));
@@ -89,15 +85,6 @@ app.get("/orderDetail", function (req, res) {
 app.listen(3000, function () {
   console.log("example app listening at http://localhost:3000");
 });
-
-// // 서버 Start
-// app.listen(3001, function () {
-//   console.log("example app listening at http://localhost:3001");
-// });
-
-
-
-
 
 // 사용자 앱에서 휴게서 위도,경도 요청시 값 보내주기 - 홈 화면(지도, 리스트)
 app.post("/requestRestAreaLatLong", function (req, res) {
@@ -251,7 +238,7 @@ function getOrderCnt(todayDate) {
 app.post("/adminRequestOrderList", function(req, res) {
   let area_nm = (req.body.area_nm == '전체' ? '%' : req.body.area_nm);
   console.log(area_nm);
-  connection.query('SELECT * FROM order_info_tb WHERE area_nm LIKE ?', [area_nm], function(error, result, fields) {
+  connection.query('SELECT * FROM order_info_tb WHERE area_nm LIKE ? ORDER BY 1 DESC', [area_nm], function(error, result, fields) {
     if(error) {
       throw error;
     } else {

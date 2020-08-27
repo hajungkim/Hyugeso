@@ -196,13 +196,16 @@
 
             for (let i = 0; i < orderListCnt; i++) {
                 let orderItem = {};
-
                 orderItem.unique = document.getElementsByName("menuCheckBox")[i].value;
                 orderItem.qty = document.getElementById(orderItem.unique + "count").innerText;
                 orderItem.price = parseInt(document.getElementById(orderItem.unique + "price").innerText);
                 orderItem.total = parseInt(document.getElementById(orderItem.unique + "total").innerText);
                 orderItem.item_name = document.getElementById(orderItem.unique + "name").innerText;
-                orderList.push(orderItem);
+                if(orderItem.qty != 0) {
+                    orderList.push(orderItem);
+                } else {
+                    continue;
+                }
                 totalPrice = totalPrice + parseInt(orderItem.total);
                 document.getElementById("totalPrice").innerText = totalPrice;
             }

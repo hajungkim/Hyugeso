@@ -37,7 +37,7 @@
             <div class="page-header">
                 <h3>주문 완료</h3>
             </div>
-            <div class="well">
+            <div id='orderCard' class="well">
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-3">
@@ -73,22 +73,34 @@
 </html>
 
 <script>
+
     const qs = getQueryStringObject();
     const ajax = $.ajax;
 
-    console.log(qs);
-    const orderArea = qs.area_nm;
-    const orderNumber = qs.order_no;
-    const totalPrice = qs.total_cost;
-    const tempDate = orderNumber.substr(2,8);
-    const orderDate = tempDate.slice(0,4) + '-' + tempDate.slice(4,6) + '-' + tempDate.slice(6);
+    console.log('qs',qs);
+    let orderArea;
+    let orderNumber;
+    let totalPrice;
+    let tempDate;
+    let orderDate;
 
-    console.log(orderNumber);
+    // 쿼리스트링에 값이 있는경우 주문카드를 그리고 아닌경우엔 안그린다
+    if(qs.order_no) {
+        orderArea = qs.area_nm;
+        orderNumber = qs.order_no;
+        totalPrice = qs.total_cost;
+        tempDate = orderNumber.substr(2,8);
+        orderDate = tempDate.slice(0,4) + '-' + tempDate.slice(4,6) + '-' + tempDate.slice(6);
+        
+        console.log(orderNumber);
 
-    document.getElementById('orderDate').innerHTML = orderDate;
-    document.getElementById('orderArea').innerHTML = orderArea;
-    document.getElementById('orderNumber').innerHTML = orderNumber;
-    document.getElementById('totalPrice').innerHTML = totalPrice;
+        document.getElementById('orderDate').innerHTML = orderDate;
+        document.getElementById('orderArea').innerHTML = orderArea;
+        document.getElementById('orderNumber').innerHTML = orderNumber;
+        document.getElementById('totalPrice').innerHTML = totalPrice;
+    } else {
+        $('#orderCard *').remove();
+    }
 
     function getQueryStringObject() {
         var a = window.location.search.substr(1).split('&');
@@ -124,17 +136,18 @@
         console.log(orderNumber);
         if(confirm('주문을 취소하시겠습니까?') == true) {
             ajax({
-            url: 'requestPayCancel',
-            type: 'POST',
-            data: {
-                order_no: orderNumber,
-            },
-            success: function(data) {
-                console.log(data);
-                alert('취소되었습니다.');
-                location.reload();
-            }   
-        })
+                url: 'requestPayCancel',
+                type: 'POST',
+                data: {
+                    order_no: orderNumber,
+                },
+                success: function(data) {
+                    console.log(data);
+                    alert('취소되었습니다.');
+                    // 취소완료 후 페이지 리로딩 하면서 주문내역 지우기
+                    location.href = '/cartOk';
+                }   
+            });
         } else {
             return false;
         }

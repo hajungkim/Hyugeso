@@ -44,15 +44,15 @@
                             </select>
                         </div>
 
-                        <table class="table">
+                        <table class="table" style="width: 90%;">
                             <thead>
                                 <tr>
-                                    <th scope="col">ORDER TIEM</th>
-                                    <th scope="col">ORDER AREA</th>
-                                    <th scope="col">ORDER NO</th>
-                                    <th scope="col">ORDERER PN</th>
-                                    <th scope="col">DETAIL</th>
-                                    <th scope="col">SERVING</th>
+                                    <th scope="col" style="width: 10%;">ORDER TIEM</th>
+                                    <th scope="col" style="width: 10%;">ORDER AREA</th>
+                                    <th scope="col" style="width: 30%;">ORDER NO</th>
+                                    <th scope="col" style="width: 20%;">ORDERER PN</th>
+                                    <th scope="col" style="width: 10%;">DETAIL</th>
+                                    <th scope="col" style="width: 10%;">SERVING</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -146,7 +146,7 @@
         console.log(oldChild);
         for (var i = 0; i < data.length; i++) {
             console.log(data[i]);
-            let flag;
+            let flag, text;
             var tr = document.createElement('tr');
             var td0 = document.createElement('td');
             var td1 = document.createElement('td');
@@ -161,11 +161,13 @@
             td3.innerHTML = data[i].orderer_pn;
             if(data[i].serving_yn === 'Y') {
                 flag = 'disabled';
+                text = '완료';
             } else {
                 flag = '';
+                text = '확인';
             }
             td4.innerHTML = `<button onclick="showDetail(this)">세부내용</button>`;    // 눌르면 주문 상세내용 나옴
-            td5.innerHTML = `<button onclick="checkOrder(this)" ${flag}>확인</button>`;        // 눌르면 주문확인 되어 사용자는 결제취소 불가능
+            td5.innerHTML = `<button onclick="checkOrder(this)" ${flag}>${text}</button>`;        // 눌르면 주문확인 되어 사용자는 결제취소 불가능
 
             tr.appendChild(td0);
             tr.appendChild(td1);
@@ -211,6 +213,8 @@
                 btn.disabled = 'true';
             }
         });
+        alert('주문을 확인했습니다.');
+        location.href = '/admin';
     }
 
     // 상세주문 팝업 

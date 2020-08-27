@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <title>휴게소 바로 주문</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+</head>
+<script src="https://cdn.bootpay.co.kr/js/bootpay-3.2.6.min.js" type="application/javascript"></script>
+
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 주문 내역 -->
+    <div class="tab-pane" id="orderHistory">
+        <div class="container">
+            <div class="page-header">
+                <div class="row">
+
+                    <div class="col-xs-6">
+                        <h3>주문내역</h3>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="navbar-form navbar-right">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <select id='gigan' class="form-control">
+                                        <option class="nowDate">오늘</option>
+                                        <option class="wholeDate">전체</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <input id='phoneNum' type="text" class="form-control" placeholder="번호 11자리를 입력해주세요."/>
+                                    <div class="input-group-btn">
+                                        <button id='btnSearch' class="btn btn-default">
+                                            <i class="glyphicon glyphicon-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="well">
+                <div class="container">
+                    <div id='orderList' class="row">
+                        <div class="col-sm-1"></div>
+
+                        <!-- <div class="col-sm-2"></div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    const ajax = $.ajax;
+    // 핸드폰번호 입력후 검색 버튼 클릭시 이벤트
+    $('#btnSearch').click(function () {
+        const phoneNum = document.getElementById('phoneNum').value;
+        const gigan = $('#gigan option:selected').val();
+        
+        try {
+            if (phoneNum.length < 11 || phoneNum.length > 11) {
+                throw 'NaNEX';
+            }
+        } catch (ex) {
+            if (ex == 'NaNEX') {
+                document.getElementById('phoneNum').value = null;
+                alert('잘못 입력하셨습니다.');
+            }
+        }
+        console.log(gigan);
+        console.log(phoneNum);
+
+        ajax({
+            url: 'requestOrderList',
+            type: 'POST',
+            data: {
+                gigan: gigan,
+                phone_no: phoneNum,
+            },
+            success: function (data) {
+                console.log(data);
+                drawOrderList(data);
+            }
+        });
+    })
+
+    // 주문내역 리스트 그리기
+    function drawOrderList(data) {
+        const div = document.getElementById('orderList');
+        let html = '';
+        for(i in data) {
+            const area_nm = data[i].area_nm;
+            const order_no = data[i].order_no;
+            const total_cost = data[i].total_cost;
+            const pay_id = data[i].pay_id;
+            const cancel_yn = data[i].cancel_yn;
+            const serving_yn = data[i].serving_yn;
+            let flag = '';
+
+            let order_date = order_no.substr(2,8);
+            var formatted = order_date.slice(0, 4) + "-" + order_date.slice(4, 6) + "-" + order_date.slice(6);
+
+            if(serving_yn == 'Y') {
+                flag = 'disabled';
+            }
+
+            console.log(i);
+            const items= `
+                <div class="col-sm-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">${formatted}</div>
+                            <div class="panel-body">
+                                <h4>${area_nm}</h4>
+                                <h4>${order_no}</h4>
+                                <h4><small><span>총 결제 금액 : </span><span>${total_cost}</span>원</small></h4>
+                                <br>
+                                <button onClick='openWin(this)' class="btn btn-info">주문상세</button>
+                                <button onClick='cancelOrder(this)' class="btn btn-danger" ${flag}>주문취소</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            if(cancel_yn == 'N') {
+                html += items;
+            }
+        }
+        div.innerHTML = html;
+    }
+
+    // 상세주문 팝업 
+    function openWin(btn) {
+        const order_no = btn.parentNode.childNodes[3].innerHTML;
+        window.open(`./orderDetail?order_no=${order_no}`,"open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
+    }
+
+    // 주문취소 프로세스
+    function cancelOrder(btn) {
+        const order_no = btn.parentNode.childNodes[3].innerHTML;
+        console.log(order_no);
+        if(confirm('주문을 취소하시겠습니까?') == true) {
+            ajax({
+            url: 'requestPayCancel',
+            type: 'POST',
+            data: {
+                order_no: order_no,
+            },
+            success: function(data) {
+                console.log(data);
+                alert('취소되었습니다.');
+                location.reload();
+            }   
+        })
+        } else {
+            return false;
+        }
+    }
+
+
+</script>

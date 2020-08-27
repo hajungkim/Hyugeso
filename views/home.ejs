@@ -1,76 +1,330 @@
-<html>
-    <head>
-    </head>
+<!DOCTYPE html>
+<html lang="en">
 
-    <body>
-        <div id='title'>
-            <h1>휴게소 앱</h1>
+<head>
+    <title>휴게소 바로 주문</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+                </ul>
+            </div>
         </div>
-        <div id='homeMap' style='width:500px; height:300px; background-color: chartreuse;'>
-            <!-- kakao 지도 -->
+    </nav>
+    <div style="text-align: center;">
+        <h4><i class="fas fa-map-marked-alt" style="font-size:25px; padding-right:10px"></i>지도에서 확인하기</h4>
+    </div>
+
+    <div class="panel panel-default" style="margin:20px">
+        <div class="panel-body">
+        <div id="kakaoMap" style="width: 100%; height:400px;">
         </div>
-        <div id='homeList' style='width:500px; height:300px; overflow:scroll; overflow-x:hidden;'>
+        <!-- <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d698315979c98f65a32752dc88bd959d"></script> -->
+        <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ce3d51b6e9cedc8c27e726793e8cbcb5"></script>
+        <script type="text/javascript"
+            src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xx81d8228c35324ed3be2ba79ed4c15a67"></script>
         </div>
-        <div id='homeBtn' style='width:500px; height:50px; margin-top:20px;'>
-            <button id='btnInfo'>휴게소정보</button>
-            <button id='btnOrder'>음식주문</button>
-        </div>
-        <div id='footer' style='width:500px; height:50px;'>
-            <button>장바구니</button>
-            <button>홈</button>
-            <button>주문내역</button>
-        </div>
-    </body>
+    </div>
+    <br>
+    <div style="text-align: center;">
+        <h4><i class="fas fa-map-marker-alt" style="font-size:25px"><span id="roadNm"></span></i> 근처 휴게소 목록</h4>
+    </div>
+
+    <div class="list-group" id='restareaList' style="margin:20px">
+        <!-- <form id='formListItems' > -->
+            <div id='listItems'>
+                
+            </div>
+            <div class="text-center" style="padding-top:20px;padding-bottom:50px">
+                <button id='btnShowInfo' onclick="showAreaInfo(this)" class="btn btn-info">정보보기</button>
+                <button id='btnShowMenu'' onclick="showAreaInfo(this)" class="btn btn-info">메뉴보기</button>
+            </div>
+        <!-- </form> -->
+    </div>
+</body>
+
 </html>
-
-<script src="/public/js/jquery-3.3.1.min.js"></script>
-
 
 <!-- home 화면 로딩 되면, 휴게소좌표 찍기위해서 데이터 요청 -->
 <script>
-    let result;
-    $.ajax({
-        url: '/requestRestAreaLatLong',
-        type: 'POST',
-        success: function(data) {
-            result = JSON.parse(data);
-            // console.log(result);
-            drawList(result);
-        }
-    })
+    const ajax = $.ajax;
+    let rName;
+    mainFlow();
 
-    function drawList(results) {
-        const listDiv = document.getElementById('homeList');
-        for(i in results) {
-            const componentUl = document.createElement('ul');
-            componentUl.id = results[i].area_code;
-            componentUl.innerHTML = results[i].area_nm;
-            listDiv.appendChild(componentUl);
+    // 메인함수
+    function mainFlow() {
+        //console.log('A');
+        getLoadNm();
+        //console.log('B');
+    }
+
+    // 유저의 현재위치 받아오기
+    async function getUserPosition() {
+        return new Promise((resolve, reject) => {
+            var userPosition = {
+                lat: null,
+                lon: null,
+            };
+            navigator.geolocation.getCurrentPosition(function (position) {
+                userPosition.lat = position.coords.latitude;
+                userPosition.lon = position.coords.longitude;
+                console.log('a', userPosition.lat, userPosition.lon);
+                if (userPosition.lat == null || userPosition.lon == null) {
+                    console.log('b', userPosition.lat, userPosition.lon);
+                } else {
+                    console.log('2');
+                    resolve(userPosition);
+                }
+            })
+        })
+    }
+
+    // 현재 위치의 도로명 받아오기
+    async function getLoadNm() {
+        // 현재위치 받기
+        // const latlng = await getUserPosition();
+        
+        // TEST 위치 - 영동고속도로 , 중부고속도로 사이
+        const latlng = {
+            lat : 37.244542,
+            lon : 127.359095,
+        }
+
+        // T map 도로명 API
+        ajax({
+            method:"GET",
+            //url:"http://223.39.119.112/tmapv20/road/nearToRoad?version=1",//가까운 도로 찾기 api 요청 url입니다.
+            url:"https://apis.openapi.sk.com/tmap/road/nearToRoad?version=1",//가까운 도로 찾기 api 요청 url입니다.
+            async : false,
+            data:{
+                "appKey" : "l7xx81d8228c35324ed3be2ba79ed4c15a67",
+                "lon" : latlng.lon,
+                "lat" : latlng.lat,
+            },
+            success:function(response){
+                
+                var resultHeader, resultlinkPoints;
+                
+                resultHeader = response.resultData.header;
+                resultlinkPoints = response.resultData.linkPoints;
+                
+                rName = resultHeader.roadName;
+                console.log("rName : ",rName);
+                document.getElementById('roadNm').innerHTML = rName;
+
+                ajax({
+                    url: '/requestRestAreaLatLong',
+                    type: 'POST',
+                    async: false,
+                    // data : {
+                    //     road_nm : rName,
+                    // },
+                    success: function (data) {
+                        const results = JSON.parse(data);
+                        var map = drawRestAreaMarker(results);
+                        drawUserMarker(results, map, latlng);
+                    }
+                });
+            },
+            error: function (request, status, error) {
+                console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+            }
+        });
+    }
+
+    // home으로 들어온 경우 기존에 있던 localstorage 에 있는 아이템 삭제
+    localStorage.removeItem('cartItem');
+
+    // 휴게소 목록 리스트 그리기
+    function drawList(results, currentPos) {
+        var iValue = rName.indexOf("고속도로");
+        var html = '';
+
+        if (iValue != -1) {
+            rName = rName.substring(0, iValue);
+        }
+
+        console.log(rName);
+        var result_distance = new Array(results.Size);
+
+        for (i in results) {
+            var restArea_roadName = results[i].road_nm;
+            var new_roadName = restArea_roadName.substring(0, restArea_roadName.length - 1);
+            if (new_roadName == rName) {
+                var distance = {
+                    lat: results[i].latitude,
+                    lon: results[i].longitude,
+                }
+                result_distance[i] = new Array(2);
+                var dis = computeDistance(currentPos, distance);
+                result_distance[i] = [dis, i];
+                results[i].road_nm = restArea_roadName;
+            }
+            
+            result_distance.sort(sortFunction);
+            
+            function sortFunction(a, b) {
+                return (a[0] < b[0]) ? -1 : 1;
+            }
+        }
+        
+        for (var i = 0; i < 6; i++) {
+            var idx = result_distance[i][1];
+            html += `<a class="list-group-item">
+                        <div class="row">
+                            <div class="col-xs-10">
+                                <strong>${results[idx].area_nm}휴게소</strong>까지 약 <strong>${result_distance[i][0].toFixed(2)}</strong> KM
+                            </div>
+                            <div class="col-xs-2">
+                                <input type="radio" name="area_code" value="${results[idx].area_code}&${results[idx].area_nm}">
+                            </div>
+                        </div>
+                    </a>`
+                }
+        document.getElementById('listItems').innerHTML = html;
+    }
+
+    // 지도그리기
+    function drawUserMarker(results, map, userPosition) {
+        // 현재 입력받은 위치 - 마커표시
+        var marker;
+        var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png', // 마커이미지의 주소입니다    
+            imageSize = new kakao.maps.Size(32, 30), // 마커이미지의 크기입니다
+            imageOption = { offset: new kakao.maps.Point(27, 69) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+        var lat = userPosition.lat;
+        var lon = userPosition.lon;
+        // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+        var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+        // 현재 위치를 중심으로 지도 생성
+        map.setCenter(new kakao.maps.LatLng(lat, lon));
+        // 마커 위치
+        var markerPosition = new kakao.maps.LatLng(lat, lon);
+        marker = new kakao.maps.Marker({
+            position: markerPosition,
+            image: markerImage // 마커이미지 설정 
+        });
+        marker.setMap(map);
+
+        drawList(results, userPosition);
+    }
+
+    // 휴게소 데이터 받아와서 휴게소 마커 그리기
+    function drawRestAreaMarker(data) {
+        var data = data;
+        // var mapContainer = document.createElement("div");
+        var mapContainer = document.getElementById("kakaoMap");
+        var mapOption = {
+            center: new kakao.maps.LatLng(37.5677463677699, 126.9153946742084), //지도의 중심좌표
+            level: 7,
+        };
+        var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
+        // 인포윈도우를 생성합니다
+        var infowindow = new kakao.maps.InfoWindow({
+            content: null,
+            removable: true,
+        });
+        // 휴게소 좌표 - 마커표시
+        for (var i in data) {
+            var areaInfo = {
+                name: data[i].area_nm,
+                code: data[i].area_code,
+                latitude: data[i].latitude,
+                longitude: data[i].longitude,
+            }
+            var marker = new kakao.maps.Marker({
+                map: map,
+                position: new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude),
+                title: areaInfo.name,
+                clickable: true
+            });
+            kakao.maps.event.addListener(marker, 'click', makeOverListener(map, marker, infowindow, areaInfo));
+        }
+        return map;
+    }
+
+    // 지도에서 휴게소 마커에 이벤트 처리
+    function makeOverListener(map, marker, infowindow, areaInfo) {
+        return function () {
+            var iwContent = 
+            `<div class="container text-left" style="width: 160px;">    
+                        <table class="table table-hover">
+                            <tr>    
+                                <td><strong>${areaInfo.name}휴게소</strong></td>
+                            </tr>
+                            <tr>    
+                                <td><div class="text-center">
+                                    <form action="/restAreaInfo">
+                                        <input style="display:none" id = "area_code" name = "area_code" value = ${areaInfo.code}>
+                                        <input type="submit" class="btn btn-info" value='휴게소정보'>
+                                    </form>
+                                </td>
+                            </tr>
+                        </table>    
+                    </div>`
+            infowindow.setContent(iwContent);
+            infowindow.setPosition(new kakao.maps.LatLng(areaInfo.latitude, areaInfo.longitude));
+            infowindow.open(map,marker);
+        };
+    }
+
+    // 내부적으로 현재위치에서 휴게소까지의 거리 계산 후 배열 리턴
+    function computeDistance(startCoords, destCoords) {
+        var startLatRads = degreesToRadians(startCoords.lat);
+        var startLongRads = degreesToRadians(startCoords.lon);
+        var destLatRads = degreesToRadians(destCoords.lat);
+        var destLongRads = degreesToRadians(destCoords.lon);
+        var Radius = 6371; //지구의 반경(km)
+        var distance = Math.acos(Math.sin(startLatRads) * Math.sin(destLatRads) +
+            Math.cos(startLatRads) * Math.cos(destLatRads) *
+            Math.cos(startLongRads - destLongRads)) * Radius;
+        return distance;
+    }
+    
+    // 원 뭐 반환함
+    function degreesToRadians(degrees) {
+        radians = (degrees * Math.PI) / 180;
+        return radians;
+    }
+
+    // 정보보기, 메뉴보기 버튼 클릭시 이벤트처리 및 예외처리
+    function showAreaInfo(btn) {
+        const checkedArea = $("input:radio[name=area_code]:checked").val();
+        console.log(checkedArea);
+        
+        if(checkedArea == undefined) {
+            alert('휴게소를 선택하세요');
+        } else {
+            let code = checkedArea.substring(0, checkedArea.indexOf('&'));
+            let name = checkedArea.substring(checkedArea.indexOf('&')+1, checkedArea.length);
+            console.log(code,name);
+
+            const btnId = btn.id;
+            if(btn.id == 'btnShowInfo') {
+                window.location.href = `/restAreaInfo?area_code=${code}`;
+            } else {
+                window.location.href = `/menuList?area_nm=${name}`;
+            }
         }
     }
 
-</script>
-
-<!-- 휴게소 선택 후, 휴게소 정보 버튼 클릭시 -->
-<script>
-    $('#btnInfo').click(function() {
-        location.href = '/info';
-        $.ajax({
-            url: '/requestRestAreaInfo',
-            type: 'POST',
-            data: {
-                area_code: 'RA001', // 여기로 휴게소 코드 넘겨 주어야 합니다
-            },
-            success: function(data) {
-                console.log(data);
-            }
-        })
-    });
-</script>
-
-<!-- 휴게소 선택 후, 음식주문 버튼 클릭시 -->
-<script>
-    $('#btnOrder').click(function() {
-        location.href = '/order';
-    });
 </script>

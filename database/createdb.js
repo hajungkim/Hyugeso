@@ -63,6 +63,25 @@ function createMenuCode (connection) {
     })
 }
 
+// orderer_info_tb
+function createOrdererInfo (connection) {
+    return new Promise( (resolve, reject) => {
+        connection.query(
+        `CREATE TABLE orderer_info_tb (
+            orderer_pn varchar(13) primary key,
+            orderer_nm varchar(10) not null,
+            order_no varchar(15) not null
+        )`,
+        function(error, result, fields) {
+            if(error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        }); 
+    })
+}
+
 
 // 사용하는 TABLE
 
@@ -109,7 +128,13 @@ function createOrderInfo (connection) {
     connection.query(
         `CREATE TABLE order_info_tb (
             order_no varchar(15) primary key,
-            orderer_pn varchar(13) not null
+            orderer_pn varchar(13) not null,
+            order_time datetime default now(),
+            pay_id varchar(40) not null,
+            area_nm varchar(30) character set utf8 not null,
+            total_cost int not null,
+            serving_yn varchar(1) not null default 'N',
+            cancel_yn varchar(1) not null default 'N'
         )`,
         function(error, result, fields) {
             if(error) {
@@ -126,11 +151,11 @@ function createOrderFoodInfo (connection) {
     return new Promise( (resolve, reject) => {
     connection.query(
         `CREATE TABLE order_food_info_tb (
-            order_no varchar(15) primary key,
-            food_code varchar(5) not null,
-            area_code varchar(5) not null,
-            menu_code varchar(5) not null,
-            orderer_pn varchar(13) not null
+            order_no varchar(15) not null,
+            food_nm varchar(30) not null,
+            food_price int(5) not null,
+            food_cnt int(5) not null,
+            total_price int(6) not null
         )`,
         function(error, result, fields) {
             if(error) {
@@ -141,25 +166,6 @@ function createOrderFoodInfo (connection) {
         }); 
     })
 }
-
-// orderer_info_tb
-function createOrdererInfo (connection) {
-    return new Promise( (resolve, reject) => {
-        connection.query(
-        `CREATE TABLE orderer_info_tb (
-            orderer_pn varchar(13) primary key,
-            orderer_nm varchar(10) not null
-        )`,
-        function(error, result, fields) {
-            if(error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        }); 
-    })
-}
-
 
 
 // DB create
@@ -168,7 +174,6 @@ async function createQuery( connection ) {
     const a = await createRestareaInfo(connection);     // 휴게소 정보 TB
     const b = await createOrderInfo(connection);        // 주문내역 TB
     const c = await createOrderFoodInfo(connection);    // 주문음식 정보 TB
-    const d = await createOrdererInfo(connection);      // 주문자 정보 TB
 
     // console.log(a, b, c, d);
     // connection end

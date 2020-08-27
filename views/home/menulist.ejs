@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>휴게소 바로 주문</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-9 col-sm-10">
+        <div id="display" class="container-fluid">
+          <!--메뉴리스트 출력-->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메뉴 리스트 읽어오기 -->
+  <script>
+    const qs = getQueryStringObject();
+    const areaName = qs.area_nm;
+
+    // 서버에서 메뉴 정보 가져오기
+    $.ajax({
+      url: '/requestMenuInfo',
+      type: 'POST',
+      data: {
+        area_nm: areaName,
+      },
+      success: function (data) {
+        console.log(data, data.length);
+
+        // API에서 휴게소 메뉴 못받아오면 에러처리
+        if (data.length == 0) {
+          alert('휴게소에 음식이 없습니다.');
+          window.location.href = '/home';
+        } else {
+          resultMenuList(data);
+        }
+      }
+    });
+
+
+    //API 가져와서 카드에 메뉴넣는 함수
+    function resultMenuList(data) {
+      var html = "<div style='text-align: center'><h4><i class='far fa-check-circle' style='font-size:25px; color:#327BE3; padding-right:10px'></i>"+ data[0].stdRestNm +"에서 주문하기</h5></div><br>";
+      $.each(data, function (key, value) {
+        html += "<div class='panel panel-default'>";
+        html += "<div class='panel-body'>";
+        html += "<div style='padding-left:20px;'> <h4>" + value.foodNm;
+        if (value.bestfoodyn == 'Y') {
+          html += "<i class='fas fa-star' style='color:#FDB612'></i>";
+        }
+        html += "</h4>";
+        html += "<p class='card-text' id=cost> " + value.foodCost + "원</p></div><br>";
+        html += "<div class='container'>";
+        html += "<div class='row'>";
+        html += `<div class="col-xs-6">
+                  <button onclick='minusBtn(this)' class="btn btn-light btn-xs"><i class="fas fa-minus"></i></button>
+                  <input type='text' value=1 style="width:20%">
+                  <button onclick='plusBtn(this)' class="btn btn-light btn-xs"><i class="fas fa-plus"></i></button>
+              </div> `;
+        html +=
+          "<button onclick='cartBtn(this)' href='#popup' data-toggle='modal' class='btn btn-primary'><i class='fas fa-shopping-cart'></i> 장바구니</button>";
+        html += `<div class="modal fade" id="popup" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">장바구니</h4>
+                  </div>
+                  <div class="modal-body" style="text-align: center">
+                    <br>
+                    <p>음식이 장바구니에 담겼습니다.</p>
+                    <p>지금 확인하시겠습니까?</p>
+                    <br>
+                  </div>
+                  <div class="modal-footer">
+                    <button id="btnCart" onClick="location.href='/cart?area_nm=${areaName}'" class="btn btn-primary">장바구니로 이동</button>
+                    <button class="btn btn-secondary" data-dismiss="modal">돌아가기</button>
+                  </div>
+                </div> 
+              </div>
+            </div>`;
+        html += "</div>";
+        html += "</div>";
+        html += "</div>";
+        html += "</div> <br>";
+      });
+      $("#display").empty();
+      $("#display").append(html);
+    }
+
+    //장바구니 버튼 누르면 로컬스토리지에 저장하는 함수
+    var array = [];
+
+    function cartBtn(btn) {
+      const data = btn.parentNode.parentNode.parentNode;
+      const count = btn.parentNode;
+
+      item = {
+        item_name: data.childNodes[0].childNodes[1].innerText,
+        price: parseInt(data.childNodes[0].childNodes[2].innerText),
+        qty: parseInt(count.firstChild.childNodes[3].value),
+        unique: array.length.toString(),
+      };
+      console.log(item);
+      array.push(item);
+      localStorage.setItem("cartItem", JSON.stringify(array));
+    };
+
+    //수량 감소 함수
+    function minusBtn(btn) {
+      const data = btn.parentNode;
+      var num = parseInt(data.childNodes[3].value) - 1;
+      if (num < 1) num = 1;
+      data.childNodes[3].value = num;
+    }
+
+    //수량 증가 함수
+    function plusBtn(btn) {
+      const data = btn.parentNode;
+      var num = parseInt(data.childNodes[3].value) + 1;
+      if (num < 1) num = 1;
+      data.childNodes[3].value = num;
+    }
+
+    // qs로 보내준 데이터를(? 이후 데이터) key : value 방식으로 자바스크립트obj 로 풀어주는 함수
+    function getQueryStringObject() {
+      var a = window.location.search.substr(1).split('&');
+      if (a == "") return {};
+      var b = {};
+      for (var i = 0; i < a.length; ++i) {
+        var p = a[i].split('=', 2);
+        if (p.length == 1) {
+          b[p[0]] = "";
+        } else {
+          b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+        }
+      }
+      return b;
+    }
+  </script>
+</body>
+
+</html>

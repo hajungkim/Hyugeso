@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>휴게소 바로 주문</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
+</head>
+<script src="https://cdn.bootpay.co.kr/js/bootpay-3.2.6.min.js" type="application/javascript"></script>
+
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+<!-- 장바구니 -->
+<div class="tab-pane" id="cart">
+    <div class="container">
+        <div class="page-header">
+            <h3>장바구니</h3>
+        </div>
+        <div class="well">
+            <div class="row" style="text-align:right; margin-right: 10px">
+                <h4>총 상품 가격<span id="totalPrice" style="padding-left:20px; padding-right:10px"></span>원</h4>
+            </div>
+            <hr>
+            <div class="row" style="text-align:right; margin-right: 10px">
+                <button class="btn btn-success" id="payBtn">
+                    <span class="glyphicon glyphicon-ok"></span> 결제하기
+                </button>
+                <button class="btn btn-danger" id="removeBtn">
+                    <span class="glyphicon glyphicon-remove"></span> 삭제하기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
+
+<script>
+    // 메뉴 안고르고 카트로 올 경우 예외처리
+    // for(var i=0; i<localStorage.length; i++) {
+    //     console.log(localStorage.key(i))
+    // }
+
+    const qs = getQueryStringObject();
+    let area_nm = qs.area_nm;
+
+    const ajax = $.ajax;
+    // 장바구니에 담을 상품
+    // menulist화면에서 session에 담아서, cart로 넘겨준다
+    // cart에서 session에 접근해서 list를 만든다
+    let cartItems = JSON.parse(localStorage.getItem('cartItem'));
+    let totalPrice = 0;
+    // 총 가격 계산
+    for (let item of cartItems) {
+        totalPrice = totalPrice + (item.qty * item.price);
+    }
+    $(() => {
+        $("#totalPrice").text(totalPrice);
+        // 메뉴 개수에 따른 장바구니 목록 출력
+        for (item of cartItems) {
+            $(".well").prepend(
+                `<div class="panel-group" id="${item.unique}panel">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <input type="checkbox" id="${item.unique}checkBox" value="${item.unique}" name="menuCheckBox"/>
+                        <span id="${item.unique}name">
+                            ${item.item_name}
+                        </span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="container" style="align-items: center;">
+                            <table style='width: 100%;'>
+                                <thead>
+                                    <th style='width:33%;'>단가</th>
+                                    <th style='width:33%;'>수량</th>
+                                    <th style='width:33%;'>가격</th>
+                                </thead>
+                                <tbody>
+                                    <td>
+                                        <span id="${item.unique}price">${item.price}원</span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-default btn-xs" id="${item.unique}minusBtn">
+                                        <span class="glyphicon glyphicon-minus"></span>
+                                        </button>
+                                        &nbsp;
+                                        <span id="${item.unique}count">${item.qty}</span>
+                                        &nbsp;
+                                        <button type="button" class="btn btn-default btn-xs" id="${item.unique}plusBtn">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <span class="price" id="${item.unique}total">${item.price * item.qty}</span>원
+                                    </td>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+            );
+        }
+        // 메뉴마다 + - 버튼 기능 추가하기
+        for (let i = 0; i < cartItems.length; i++) {
+            //수량 + 버튼
+            $(`#${cartItems[i].unique}plusBtn`).click(() => {
+                let count = $(`#${cartItems[i].unique}count`).text(); // 수량
+                let price = cartItems[i].price; // 음식 가격
+
+                count = parseInt(count) + 1;
+                price = parseInt(price) * count;
+                totalPrice = totalPrice + cartItems[i].price;
+
+                cartItems[i].qty = count;
+                $(`#${cartItems[i].unique}count`).text(count); // 삽입
+                $(`#${cartItems[i].unique}total`).text(price); // 삽입
+                $(`#totalPrice`).text(totalPrice); // 삽입
+            });
+            // 수량 - 버튼
+            $(`#${cartItems[i].unique}minusBtn`).click(() => {
+                let count = $(`#${cartItems[i].unique}count`).text(); // 수량
+                let price = cartItems[i].price; // 음식 가격
+
+                count = parseInt(count) - 1;
+
+                if (count < 0) {
+                    count = 0;
+                } else {
+                    totalPrice = totalPrice - cartItems[i].price; // 수량이 0이면 총 가격에 변화 없음
+                }
+                price = parseInt(price) * count;
+
+                cartItems[i].qty = count;
+                $(`#${cartItems[i].unique}count`).text(count); // 삽입
+                $(`#${cartItems[i].unique}total`).text(price); // 삽입
+                $(`#totalPrice`).text(totalPrice); // 삽입
+            });
+        }
+
+        // 결제하기
+        $("#payBtn").click(() => {
+
+            // 전화번호 입력시 숫자만 & 11자리 입력 예외처리
+            var phone_no;
+            var formatted_phone_no;
+
+            while(1) {
+                phone_no = prompt('핸드폰번호 입력');
+                if(phone_no == null) {
+                    // 번호 입력 안하고 취소
+                    break;
+                } else {
+                    // 번호 입력 후 확인
+                    var reg = /^[0-9]*$/;
+                    if(!reg.test(phone_no)) {
+                        alert('숫자만 입력하세요')
+                    } else {
+                        if(phone_no.length != 11) { 
+                            alert('핸드폰번호 11자리를 입력해주세요.');
+                        } else {
+                            // 받은 전화번호 포맷팅
+                            formatted_phone_no = phone_no.slice(0, 3) + "-" + phone_no.slice(3, 7) + "-" + phone_no.slice(7);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            let order_no;
+            let totalPrice = 0;
+            let orderList = [];
+            let orderListCnt = document.getElementsByName("menuCheckBox").length;
+
+            for (let i = 0; i < orderListCnt; i++) {
+                let orderItem = {};
+                orderItem.unique = document.getElementsByName("menuCheckBox")[i].value;
+                orderItem.qty = document.getElementById(orderItem.unique + "count").innerText;
+                orderItem.price = parseInt(document.getElementById(orderItem.unique + "price").innerText);
+                orderItem.total = parseInt(document.getElementById(orderItem.unique + "total").innerText);
+                orderItem.item_name = document.getElementById(orderItem.unique + "name").innerText;
+                if(orderItem.qty != 0) {
+                    orderList.push(orderItem);
+                } else {
+                    continue;
+                }
+                totalPrice = totalPrice + parseInt(orderItem.total);
+                document.getElementById("totalPrice").innerText = totalPrice;
+            }
+
+            console.log(orderList);
+
+            // 현재 카트에 주문되어있는 값들로 리스트 생성
+            BootPay.request({
+                    price: totalPrice, //실제 결제되는 가격
+                    application_id: '5f34ea102fa5c20025eecac0',
+                    name: area_nm, //결제창에서 보여질 이름
+                    pg: '',
+                    method: '', //결제수단, 입력하지 않으면 결제수단 선택부터 화면이 시작합니다.
+                    show_agree_window: 0, // 부트페이 정보 동의 창 보이기 여부
+                    items: orderList,
+                    user_info: {
+                        phone: formatted_phone_no // 사용자 핸드폰 번호 입력 받아야함 
+                    },
+                    order_id: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
+                })
+                .error(function (data) {
+                    //결제 진행시 에러가 발생하면 수행됩니다.
+                    console.log(data)
+                })
+                .cancel(function (data) {
+                    //결제가 취소되면 수행됩니다.
+                    console.log(data)
+                })
+                .ready(function (data) {
+                    // 가상계좌 입금 계좌번호가 발급되면 호출되는 함수입니다.
+                    console.log(data)
+                })
+                .confirm(function (data) {
+                    //결제가 실행되기 전에 수행되며, 주로 재고를 확인하는 로직이 들어갑니다.
+                    //주의 - 카드 수기결제일 경우 이 부분이 실행되지 않습니다.
+                    const pay_id = data.receipt_id;
+
+                    console.log('결제요청',data);
+                    // 서버로 결제 검증
+                    ajax({
+                        url: 'requestPayment',
+                        type: 'POST',
+                        data: {
+                            name: area_nm,
+                            price: totalPrice,
+                            items: JSON.stringify(orderList),
+                            phone: formatted_phone_no,
+                            receipt_id: pay_id,
+                        },
+                        success: function(data) {
+                            console.log('서버에서 응답 옴');
+                            console.log('2',data);
+                            order_no = data.order_no;
+                            
+                            if (data.code == 200) {
+                                console.log('성공');
+                                BootPay.transactionConfirm(data) // 조건이 맞으면 승인 처리를 한다.
+                            } else {
+                                console.log('실패');
+                                BootPay.removePaymentWindow() // 조건이 맞지 않으면 결제 창을 닫고 결제를 승인하지 않는다.
+                            }
+                        }
+                    });
+                })
+                .close(function (data) {
+                    // 결제창이 닫힐때 수행됩니다. (성공,실패,취소에 상관없이 모두 수행됨)
+                    console.log('결제창닫기',data)
+                })
+                .done(function (data) {
+                    //결제가 정상적으로 완료되면 수행됩니다
+                    //비즈니스 로직을 수행하기 전에 결제 유효성 검증을 하시길 추천합니다.
+                    console.log('결제완료',data);
+                    window.location.href = `/cartOk?order_no=${order_no}&area_nm=${data.item_name}&total_cost=${data.amount}`
+                })
+        });
+
+
+        // 장바구니 삭제
+        $("#removeBtn").click(() => {
+            // debugger;
+            let checkedMenu = $("input:checked");
+            if (checkedMenu) {
+
+                $('input:checked').each(function () {
+                    var unique = `${this.value}total`;
+                    var removedPrice = document.getElementById("" + unique + "").innerHTML;
+                    totalPrice -= removedPrice;
+                })
+                $('input:checked').parentsUntil('.panel-group').remove(); // 장바구니 삭제
+                $(`#totalPrice`).text(totalPrice); // 삽입
+            }
+        });
+    });
+
+    function getQueryStringObject() {
+        var a = window.location.search.substr(1).split('&');
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i) {
+            var p = a[i].split('=', 2);
+            if (p.length == 1) {
+                b[p[0]] = "";
+            } else {
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+        }
+        return b;
+    }
+</script>

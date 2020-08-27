@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>휴게소 바로 주문</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="well">
+            <div class="container" id='restAreaInfoData'>
+                <!-- 휴게소 정보 출력 -->
+            </div>
+            <div class="container" style="align-items: center;">
+                <div id="map" style="width:80%;height:350px; margin-left: 5%;"></div>
+            </div>
+            <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ce3d51b6e9cedc8c27e726793e8cbcb5"></script>
+            <div class="text-center">
+                <br>
+                <button id="btnMenu" class="btn btn-info">주문하기</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<!-- 휴게소 선택 후, 휴게소 정보 버튼 클릭시 -->
+<script>
+    const qs = getQueryStringObject();
+    let areaCode = qs.area_code;
+    let areaName;
+    // 휴게소 정보 읽어오기 ajax
+    $.ajax({
+        url: '/requestRestAreaInfo',
+        type: 'POST',
+        data: {
+            area_code: areaCode, // 여기로 휴게소 코드 넘겨 주어야 합니다
+        },
+        
+        success: function (data) {
+            const results = JSON.parse(data);
+            areaName = results[0].area_nm;
+            console.log(results);
+            //drawInfoPage(results[0]);
+            drawTable(results[0]);
+            drawMap(results[0]);
+        }
+    });
+    // 주문버튼 눌렀을때 휴게소 이름 넘겨주기
+    $('#btnMenu').click(function () {
+        window.location.href = '/menulist?area_nm=' + areaName;
+    });
+    // qs로 보내준 데이터를(? 이후 데이터) key : value 방식으로 자바스크립트obj 로 풀어주는 함수
+    function getQueryStringObject() {
+        var a = window.location.search.substr(1).split('&');
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i) {
+            var p = a[i].split('=', 2);
+            if (p.length == 1) {
+                b[p[0]] = "";
+            } else {
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+        }
+        return b;
+    }
+    function drawTable(results) {
+        const div1 = document.getElementById('restAreaInfoData');
+        const conv_yn = [results['restroom_yn'], results['pharmacy_yn'], results['lpg_yn'], results['gas_yn'], results['electric_yn']];
+        const conv_img = [
+            `<i class="fas fa-toilet" style="color: Tomato;"></i> 화장실 `,
+            `<i class="fas fa-first-aid" style="color: Tomato;"></i> 약국 `,
+            `<i class="fas fa-gas-pump" style="color: Tomato;"></i> LPG `,
+            `<i class="fas fa-gas-pump" style="color: Tomato;"></i> GAS `,
+            `<i class="fas fa-charging-station" style="color: Tomato;"></i> 전기차 충전소 `
+        ];
+        var convinence = `<tr><td><i class="fas fa-grin-hearts" style="color: Tomato;"></i></td> <td>편의시설</td><td>`;
+        for (var i = 0; i < 5; i++) {
+            if (conv_yn[i] == 'Y') {
+                convinence += conv_img[i];
+            }
+        }
+        convinence += '</td></tr>';
+        const thead =
+            `<thead>
+                <tr>
+                    <th colspan="3">
+                        <h4>${results['area_nm']} 휴게소
+                            <small>${results['road_nm']}고속도로 제${results['road_no']}호선<small>
+                        </h4>
+                    </th>
+                <tr>
+             </thead>`
+        const tbody =
+            `<tbody>
+                <tr>
+                    <td><i class="fas fa-parking" style="color: Tomato;"></i></td>
+                    <td>주차공간</td>
+                    <td>${results['parking_space_cnt']}석</td>
+                </tr>
+                <tr>
+                    <td><i class="fas fa-phone-square" style="color: Tomato;"></i></td>
+                    <td>전화번호</td>
+                    <td><a href='tel:${results['area_pn']}'>${results['area_pn']}</a></td>
+                </tr>
+                ${convinence}
+                <tr>
+                    <td><i class="fas fa-map-marker-alt" style="color: Tomato;"></i></td>
+                    <td>오시는길</td>
+                    <td></td>
+                </tr>
+            </tbody>`;
+        div1.innerHTML = "<div class='container'><table class='table' style='width: 83%;'>" + thead + tbody + "</table></div>";
+    }
+</script>
+
+<script>
+    function drawMap(results) {
+        //console.log("lat : ", results['latitude'], " long : ", results['longitude']);
+        var mapContainer = document.getElementById('map'); // 지도를 표시할 div 
+        var mapOption = {
+            center: new kakao.maps.LatLng(results['latitude'], results['longitude']), //지도의 중심좌표
+            level: 5
+        };
+        // 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(results['latitude'], results['longitude']),
+            //title: areaInfo.name,
+            //clickable : true
+        });
+        marker.setMap(map);
+    }
+</script>

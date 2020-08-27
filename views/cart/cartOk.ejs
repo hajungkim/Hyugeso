@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>휴게소 바로 주문</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/1853ff613c.js" crossorigin="anonymous"></script>
+</head>
+<script src="https://cdn.bootpay.co.kr/js/bootpay-3.2.6.min.js" type="application/javascript"></script>
+
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home"><i class="fas fa-utensils" style="color:#ffff; font-size:25px"></i></a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/orderlist"><i class="fas fa-list-ul"></i> OrderList</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 장바구니 -->
+    <div class="tab-pane" id="cart">
+        <div class="container">
+            <div class="page-header">
+                <h3>주문 완료</h3>
+            </div>
+            <div id='orderCard' class="well">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="panel panel-default">
+                                <div id='orderDate' class="panel-heading"></div>
+                                    <div class="panel-body">
+                                        <input type="hidden" name="order_no" value=${order_no}>
+                                        <h4 id='orderArea'></h4>
+                                        <h4 id='orderNumber'></h4>
+                                        <h4><small><span>총 결제 금액 : </span><span id='totalPrice'></span>원</small></h4>
+                                        <button onClick='openWin()' class="btn btn-info">주문상세</button>
+                                        <button onClick='cancelOrder()' class="btn btn-danger">주문취소</button>
+                                        <br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div style="text-align:center">
+                    <button class="btn btn-info" onclick="moveHome()">
+                        <span></span> 홈으로 가기
+                    </button>
+                    <button class="btn btn-info" onclick="moveOrderList()">
+                        <span></span> 주문내역 확인하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+
+    const qs = getQueryStringObject();
+    const ajax = $.ajax;
+
+    console.log('qs',qs);
+    let orderArea;
+    let orderNumber;
+    let totalPrice;
+    let tempDate;
+    let orderDate;
+
+    // 쿼리스트링에 값이 있는경우 주문카드를 그리고 아닌경우엔 안그린다
+    if(qs.order_no) {
+        orderArea = qs.area_nm;
+        orderNumber = qs.order_no;
+        totalPrice = qs.total_cost;
+        tempDate = orderNumber.substr(2,8);
+        orderDate = tempDate.slice(0,4) + '-' + tempDate.slice(4,6) + '-' + tempDate.slice(6);
+        
+        console.log(orderNumber);
+
+        document.getElementById('orderDate').innerHTML = orderDate;
+        document.getElementById('orderArea').innerHTML = orderArea;
+        document.getElementById('orderNumber').innerHTML = orderNumber;
+        document.getElementById('totalPrice').innerHTML = totalPrice;
+    } else {
+        $('#orderCard *').remove();
+    }
+
+    function getQueryStringObject() {
+        var a = window.location.search.substr(1).split('&');
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i) {
+            var p = a[i].split('=', 2);
+            if (p.length == 1) {
+                b[p[0]] = "";
+            } else {
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+        }
+        return b;
+    }
+
+    function moveHome() {
+        window.location.href = '/home';
+    }
+
+    function moveOrderList() {
+        window.location.href = '/orderList';
+    }
+
+    // 상세주문 팝업 
+    function openWin() {
+        console.log(orderNumber);
+        window.open(`/orderDetail?order_no=${orderNumber}`,"open","toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=400, height=400");
+    }
+
+    // 주문취소 프로세스
+    function cancelOrder() {
+        console.log(orderNumber);
+        if(confirm('주문을 취소하시겠습니까?') == true) {
+            ajax({
+                url: 'requestPayCancel',
+                type: 'POST',
+                data: {
+                    order_no: orderNumber,
+                },
+                success: function(data) {
+                    console.log(data);
+                    alert('취소되었습니다.');
+                    // 취소완료 후 페이지 리로딩 하면서 주문내역 지우기
+                    location.href = '/cartOk';
+                }   
+            });
+        } else {
+            return false;
+        }
+    }
+</script>

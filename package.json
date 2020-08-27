@@ -1,0 +1,32 @@
+{
+  "name": "fintech-project-2020",
+  "version": "1.0.0",
+  "description": "npm install express",
+  "main": "server.js",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "bootpay-js": "^3.2.6",
+    "bootpay-rest-client": "^2.0.3",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.4",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Taeph/fintech-project-2020.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Taeph/fintech-project-2020/issues"
+  },
+  "homepage": "https://github.com/Taeph/fintech-project-2020#readme"
+}
